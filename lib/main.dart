@@ -94,6 +94,24 @@ class _MyHomePageState extends State<MyHomePage> {
       emailTitle: 'John Doe has commented on your Post',
       emailBody: 'John Doe has commented on your post. To view details, please'
     ),
+    IncomingMailItem(
+      date: DateTime.now().subtract(Duration(hours: 7)),
+      senderName: 'Facebook',
+      emailTitle: 'John Doe has commented on your Post',
+      emailBody: 'John Doe has commented on your post. To view details, please'
+    ),
+    IncomingMailItem(
+      date: DateTime.now().subtract(Duration(hours: 7)),
+      senderName: 'Facebook',
+      emailTitle: 'John Doe has commented on your Post',
+      emailBody: 'John Doe has commented on your post. To view details, please'
+    ),
+    IncomingMailItem(
+      date: DateTime.now().subtract(Duration(hours: 7)),
+      senderName: 'Facebook',
+      emailTitle: 'John Doe has commented on your Post',
+      emailBody: 'John Doe has commented on your post. To view details, please'
+    ),
   ];
   
 
@@ -105,8 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
+    final varAppBar = AppBar(
         backgroundColor: Theme.of(context).backgroundColor,
         actions: <Widget> [
 
@@ -134,7 +151,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ]
-      ),
+      );
+
+
+    return Scaffold(
+      appBar: varAppBar,
 
       body: Container(
         color: Theme.of(context).backgroundColor,
@@ -142,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
           
             
           children: <Widget>[
-            IncomingMails( _incomingMailList)
+            IncomingMails( _incomingMailList, varAppBar.preferredSize)
 
           ],
 
