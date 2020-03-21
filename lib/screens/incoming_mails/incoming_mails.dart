@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mail_client_app/models/incoming_mail_Item.dart';
-import 'package:mail_client_app/widgets/mail_item.dart';
+import './mail_item.dart';
+
 
 class IncomingMails  extends StatelessWidget {
 
