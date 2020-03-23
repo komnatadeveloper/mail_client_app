@@ -7,7 +7,83 @@ import '../../layout/app_drawer/app_drawer.dart';
 import '../../models/incoming_mail_Item.dart';
 import './incoming_mails.dart';
 
+import './new_email_bottom_sheet.dart';
+
 class IncomingMailsScreen extends StatefulWidget {
+  static const routeName = '/incoming-mails';
+
+  // void _startSendNewEmail( BuildContext ctx ) {
+  //   showModalBottomSheet(
+  //     context: ctx, 
+  //     builder: ( _ ) {
+  //       return NewEmailBottomSheet();
+
+  //     }
+  //   );
+
+  // void _startSendNewEmail( BuildContext ctx ) {
+  //   showModalBottomSheet(
+  //           context: ctx,
+  //           builder: (BuildContext ctx) {
+  //             return DraggableScrollableSheet(
+  //               initialChildSize: 0.5,
+  //               maxChildSize: 1,
+  //               minChildSize: 0.25,
+  //               builder:
+  //                   (BuildContext context, ScrollController scrollController) {
+  //                 return Container(
+  //                   color: Colors.white,
+  //                   child: ListView.builder(
+  //                     controller: scrollController,
+  //                     itemCount: 25,
+  //                     itemBuilder: (BuildContext context, int index) {
+  //                       return ListTile(title: Text('Item $index'));
+  //                     },
+  //                   ),
+  //                 );
+  //               },
+  //             );
+  //           },
+  //         );
+  // }
+  void _startSendNewEmail( BuildContext ctx ) {
+    showModalBottomSheet(
+        context: ctx,
+        isScrollControlled: true,
+        builder: (context) {
+          return FractionallySizedBox(
+            heightFactor: 0.90,
+            child: NewEmailBottomSheet(),
+          );
+        });
+  }
+
+  // void _startSendNewEmail( BuildContext ctx ) {
+  //   showDialog(
+  //     context: ctx, 
+  //     builder: ( ctx ) {
+  //       return Material(
+
+
+  //         child: Container(
+  //           width: MediaQuery.of(ctx).size.width,
+  //           height: (MediaQuery.of(ctx).size.height - 200.00),
+  //           color: Theme.of(ctx).backgroundColor,
+
+  //           child: SingleChildScrollView(
+  //             child: IconButton(
+  //               icon: Icon(Icons.close),
+  //               onPressed: () {
+                  
+  //               },
+  //             ),
+  //           ),
+  //         ),
+  //       );
+
+  //     }
+  //   );
+  // }
 
   @override
   _IncomingMailsScreenState createState() => _IncomingMailsScreenState();
@@ -90,7 +166,9 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
       ),
       
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},        
+        onPressed: () {
+          widget._startSendNewEmail(context);
+        },        
         child: Icon(Icons.edit),
       ), // This trailing comma makes auto-formatting nicer for build methods.
 

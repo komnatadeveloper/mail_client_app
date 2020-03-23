@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mail_client_app/screens/settings/settings_screen.dart';
 
 
 import './screens/incoming_mails/incoming_mails_screen.dart';
+import './screens/accounts/accounts_screen.dart';
+import './screens/settings/settings_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -28,7 +29,10 @@ class MyApp extends StatelessWidget {
       ),
       home: IncomingMailsScreen(),
       routes: {
-        SettingsScreen.routeName : (ctx) => SettingsScreen()
+        SettingsScreen.routeName : (ctx) => SettingsScreen(),
+        IncomingMailsScreen.routeName : (ctx) => IncomingMailsScreen(),
+        AccountsScreen.routeName : (ctx) => AccountsScreen(),
+
       }
     );
   }

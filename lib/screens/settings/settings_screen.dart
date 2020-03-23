@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../incoming_mails/incoming_mails_screen.dart';
+import '../accounts/accounts_screen.dart';
+
 class SettingsScreen extends StatelessWidget {
 
   static const routeName = '/settings';
@@ -15,7 +18,9 @@ class SettingsScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.close),
             onPressed: () {
-              Scaffold.of(context).openDrawer();
+              Navigator.of(context).pushReplacementNamed(
+                IncomingMailsScreen.routeName
+              );
             },
           ),
           Expanded(
@@ -52,7 +57,9 @@ class SettingsScreen extends StatelessWidget {
                       color: Theme.of(context).textTheme.title.color,
                     ),
                     onTap: () {
-
+                      Navigator.of(context).pushReplacementNamed(
+                        AccountsScreen.routeName
+                      );
                     },
                   ),
                 ),
