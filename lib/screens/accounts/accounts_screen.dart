@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/mail_connection_provider.dart';
 
 import '../settings/settings_screen.dart';
 
@@ -85,6 +88,7 @@ class AccountsScreen extends StatelessWidget {
             ),
             Divider(),
 
+            // ADD ACCOUNT BUTTON
             RaisedButton(
               child: Container(
                 width: (MediaQuery.of(context).size.width - 50),
@@ -99,11 +103,17 @@ class AccountsScreen extends StatelessWidget {
               color: Colors.blue,              
               
 
-              onPressed: () {
-
+              onPressed: ()  async {
+                // Provider.of<MailConnectionProvider>(context).getMails();
+                // Provider.of<MailConnectionProvider>(context).getMailsByImapClient2();
+                Provider.of<MailConnectionProvider>(context).getMails();
               },
               
               
+            ),
+            Text(
+              Provider.of<MailConnectionProvider>(context).toBePrinted,
+              style: TextStyle(color: Colors.white),
             )
           ],
         ),
