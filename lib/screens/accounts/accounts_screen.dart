@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/mail_connection_provider.dart';
 
 import '../settings/settings_screen.dart';
+import '../add_exchange_account/add_exchange_account_screen.dart';
 
 class AccountsScreen extends StatelessWidget {
   static const routeName = '/accounts';
@@ -83,6 +84,7 @@ class AccountsScreen extends StatelessWidget {
                   // Navigator.of(context).pushReplacementNamed(
                   //   AccountsScreen.routeName
                   // );
+
                 },
               ),
             ),
@@ -106,7 +108,12 @@ class AccountsScreen extends StatelessWidget {
               onPressed: ()  async {
                 // Provider.of<MailConnectionProvider>(context).getMails();
                 // Provider.of<MailConnectionProvider>(context).getMailsByImapClient2();
-                Provider.of<MailConnectionProvider>(context).getMails();
+                // Provider.of<MailConnectionProvider>(context).getMailsByImapClient2();
+
+                Navigator.of(context).pushReplacementNamed(
+                  AddExchangeAccountScreen.routeName
+                );
+
               },
               
               

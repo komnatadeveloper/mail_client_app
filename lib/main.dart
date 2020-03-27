@@ -7,6 +7,8 @@ import './providers/mail_connection_provider.dart';
 import './screens/incoming_mails/incoming_mails_screen.dart';
 import './screens/accounts/accounts_screen.dart';
 import './screens/settings/settings_screen.dart';
+import './screens/add_exchange_account/add_exchange_account_screen.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -43,6 +45,7 @@ class MyApp extends StatelessWidget {
           SettingsScreen.routeName : (ctx) => SettingsScreen(),
           IncomingMailsScreen.routeName : (ctx) => IncomingMailsScreen(),
           AccountsScreen.routeName : (ctx) => AccountsScreen(),
+          AddExchangeAccountScreen.routeName : (ctx) => AddExchangeAccountScreen(),
 
         }
       )   //Material App,
