@@ -158,7 +158,7 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
           
             
           children: <Widget>[
-            IncomingMails( _incomingMailList, varAppBar.preferredSize)
+            IncomingMails( varAppBar.preferredSize )
 
           ],
 

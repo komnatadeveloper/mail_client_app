@@ -19,13 +19,6 @@ import '../models/email_account.dart';
 
 
 
-
-
-
-
-
-
-
 class MailConnectionProvider with ChangeNotifier { 
 
   List<enoughMail.ImapClient> clientList = [];
@@ -33,6 +26,7 @@ class MailConnectionProvider with ChangeNotifier {
   int _accountCount;
   String _preferredMail;
   String _preferredView;
+  dynamic _headersList = [];   // dynamic to be changed in future
 
   bool get isImapClientLogin {
     return _isImapClientLogin;
@@ -46,6 +40,11 @@ class MailConnectionProvider with ChangeNotifier {
   String get preferredView {
     return _preferredView;
   }
+  dynamic get headersList {
+    return _headersList;
+  }
+
+
 
   String toBePrinted = 'Empty';
 
@@ -412,7 +411,9 @@ testVar3.result.toString()
 
       // await fetchSubjects( client, 1,  mailCount);
       // await fetchDate( client, 1,  mailCount);
-      await fetchHeaderFields( client, 1,  mailCount);
+      final tempHeadersList = await fetchHeaderFields( client, 1,  mailCount);
+
+      _headersList = [...tempHeadersList];
 
 
       // Get Single "test"

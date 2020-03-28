@@ -21,7 +21,7 @@ class MailItem extends StatelessWidget {
                   ),
                   height: 20,
                   child: Text( 
-                    incomingMailsListItem.senderName ,
+                    incomingMailsListItem['From'] ,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -38,7 +38,7 @@ class MailItem extends StatelessWidget {
                     left: 5
                   ),
                   child: Text( 
-                    incomingMailsListItem.emailTitle,
+                    incomingMailsListItem['Subject'],
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold ,
@@ -63,7 +63,8 @@ class MailItem extends StatelessWidget {
                       Expanded(
                         child:                           
                         Text( 
-                          incomingMailsListItem.emailBody,
+                          // incomingMailsListItem.emailBody,
+                          'This is Temporarily not OK',
 
                           overflow: TextOverflow.clip,
                           style: TextStyle(
@@ -74,7 +75,8 @@ class MailItem extends StatelessWidget {
                       ),
 
                       Text( 
-                        '  ${DateFormat('yyyy/MM/dd').format(incomingMailsListItem.date)}' ,
+                        // '  ${DateFormat('yyyy/MM/dd').format(incomingMailsListItem.date)}' ,
+                        incomingMailsListItem['Date'],
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).textTheme.title.color

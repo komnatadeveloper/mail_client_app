@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:mail_client_app/models/incoming_mail_Item.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/mail_connection_provider.dart';
+
+import '../../models/incoming_mail_Item.dart';
 import './mail_item.dart';
+
 
 
 class IncomingMails  extends StatelessWidget {
 
-  final List<IncomingMailItem> incomingMailsList;
+  // final List<IncomingMailItem> incomingMailsList;
   final Size appBarPreferredHeight;
 
-  IncomingMails(this.incomingMailsList, this.appBarPreferredHeight);
+  IncomingMails( this.appBarPreferredHeight );
+
+
 
   
 
 
   @override
   Widget build(BuildContext context) {
+    var mailConnectionProvider = Provider.of<MailConnectionProvider>(context);
+
     return LayoutBuilder(
       builder: (ctx, constraints) {
         return Container(
@@ -34,12 +43,12 @@ class IncomingMails  extends StatelessWidget {
                 ),
 
 
-                child: MailItem( incomingMailsList[index] ),
+                child: MailItem( mailConnectionProvider.headersList[index] ),
                   
 
               );
             },
-            itemCount: incomingMailsList.length,
+            itemCount: mailConnectionProvider.headersList.length,
           )
 
         );
