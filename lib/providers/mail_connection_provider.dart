@@ -2,19 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Fot http requests http.dart & convert for json.decode & json.encode
-import 'package:http/http.dart' as http;
+// For http requests http.dart & convert for json.decode & json.encode
+// import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 import 'package:enough_mail/enough_mail.dart' as enoughMail;
 
 
-import 'package:imap_client/imap_client.dart' as imapClient;
+// import 'package:imap_client/imap_client.dart' as imapClient;
 
-import '../local_environment/vars.dart';
-
-
+import "../environment/vars.dart";
+// import 'package:mail_client_app/environment/vars.dart';
 import '../models/email_account.dart';
+
+
+
+
+
+
+
+
 
 
 
@@ -22,53 +29,120 @@ import '../models/email_account.dart';
 class MailConnectionProvider with ChangeNotifier { 
 
   List<enoughMail.ImapClient> clientList = [];
-  enoughMail.ImapClient client = null;
+  var _isImapClientLogin = false;
+  int _accountCount;
+  String _preferredMail;
+  String _preferredView;
+
+  bool get isImapClientLogin {
+    return _isImapClientLogin;
+  }
+  int get accountCount {
+    return _accountCount;
+  }
+  String get preferredMail {
+    return _preferredMail;
+  }
+  String get preferredView {
+    return _preferredView;
+  }
 
   String toBePrinted = 'Empty';
 
+
+  // Get Initial Data From DB
+  Future<void> getInitDataFromDb ()  async{
+    final prefs = await SharedPreferences.getInstance();
+
+    // If First Use of App
+    if(  !prefs.containsKey( 'komnataMailClient' ) ) {      
+      final logToAdd = convert.json.encode( { 
+        'accountList': [],
+        'preferredView': 'inbox',  //  'inbox' 'sent' 'viewed' 'archieve' 'trash'
+        'preferredMail': 'all'  // "mailAddress" or "all"
+      });
+      prefs.setString('komnataMailClient', logToAdd);
+
+      _accountCount = 0;
+      _preferredMail = 'inbox';
+      _preferredView = 'all';
+
+
+    } else {
+      final extractedUserData = convert.json.decode(
+        prefs.getString('komnataMailClient')
+      ) as Map<String, Object>;
+
+      final tempAccountList = extractedUserData['accountList'] as List;
+      _accountCount = tempAccountList.length;
+      _preferredMail = extractedUserData['preferredMail'];
+      _preferredView = extractedUserData['preferredView'];
+    }
+  }  // End of getInitDataFromDb
+
+
+  // Add Account
   Future<void> addAccount ( EmailAccount newAccount) async {
+
+    if( true ) {
+      getEnoughMails();
+      return;
+    }
 
     print(newAccount.emailAddress);
     print(newAccount.emailPassword);
     print(newAccount.incomingMailsServer);
     print(newAccount.incomingMailsPort);
+    
 
     var client  = enoughMail.ImapClient(isLogEnabled: true);
     await client.connectToServer(newAccount.incomingMailsServer, int.parse(newAccount.incomingMailsPort), isSecure: true);
     var loginResponse = await client.login( newAccount.emailAddress, newAccount.emailPassword );
 
     if (loginResponse.isOkStatus) {
-      final accountToAdd = convert.json.encode( { 
+
+      // Save Account Info to Device
+
+
+      // final accountToAdd = convert.json.encode( { 
+      //   'email' : newAccount.emailAddress,
+      //   'password' : newAccount.emailPassword,
+      //   'incomingServer': newAccount.incomingMailsServer,
+      //   'port' : newAccount.incomingMailsPort
+      // });
+
+      // Prepare Format of Account to Add
+      final accountToAdd =  { 
         'email' : newAccount.emailAddress,
         'password' : newAccount.emailPassword,
         'incomingServer': newAccount.incomingMailsServer,
         'port' : newAccount.incomingMailsPort
-      });
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setString('komnataMailClient', accountToAdd);
-      clientList.add(client);
+      };
 
-      print( convert.json.decode(accountToAdd) );
-      print('Account Added');
+      // Save Account on Device
+      final prefs = await SharedPreferences.getInstance();
+      final extractedUserData = convert.json.decode(
+        prefs.getString('komnataMailClient')
+      ) as Map<String, Object>;
+      final tempAccountList = extractedUserData['accountList'] as List;
+      tempAccountList.add(accountToAdd);
+      extractedUserData['accountList'] = tempAccountList;
+      prefs.setString(
+        'komnataMailClient', 
+        convert.json.encode(extractedUserData)
+      );
+
+      _accountCount++;
+      clientList.add(client);
+      notifyListeners();
+
+      print('Account Below has been Added');
+      print( accountToAdd );
     }    
   }   // End of addAccount
 
-  Future<void> getMails1 () async { 
-
-    var listResponse = await clientList[0].listMailboxes();
-      if (listResponse.isOkStatus) {
-
-      // Select MailBox
-      await client.selectMailbox( listResponse.result[0]);
-
-      var mailCount = listResponse.result[0].messagesExists;
-
-      var headerResponse = await client.fetchMessages(1, mailCount, "BODY.PEEK[HEADER.FIELDS (SUBJECT)]");
-      
-    }
 
 
-  }
 
 
 
@@ -175,57 +249,49 @@ testVar3.result.toString()
     }
   } // end of getMails
 
+  String handleFetchedComplexBase64 (String data) {        
 
-  Future<void> getMailsByImapClient () async { 
-    var client = new imapClient.ImapClient();
-    // connect
-    await client.connect(incomingServer2, portNo2, true);
-    // print(['resultTest1', resultTest1]);
-    // authenticate
-    await client.login(mailAddress2, mailPassword2);
-    // get folder
-    var inbox = await client.getFolder("inbox");
+    if( data.toString().contains('?utf-8?B?')  || data.toString().contains('?UTF-8?B?') ) {
+      var datatoHandle = data.toString();
 
-    print(['mailCount: ', inbox.mailCount]);
-    print(['unseenCount: ', inbox.unseenCount]);
-    print(['subset of folderSS: ', await inbox.list('INBOX')]);
+      // Transform String
+      var step1 = datatoHandle.replaceAll('=?utf-8?B?', 'STARTER');             
+      var step2 = step1.replaceAll('=?UTF-8?B?', 'STARTER'); 
+      var step3 = step2.replaceAll('==?=', 'ENDING'); 
+      var step4 = step3.replaceAll('?=', 'ENDING'); 
+            
 
-    var allMessagesTest = await inbox.fetch([ "BODY.PEAK[HEADER.FIELDS (From Subject Date)]"], messageIds: [7] );
-    print(['allMessagesTest: ', allMessagesTest ]);
+      List<String> stringArray = [];
+      int stringStartIndex;
+      int stringEndIndex;
+      String addString;
 
+      // Creating Strings Array
+      while( step4.contains('STARTER')  ) {
+        stringStartIndex = step4.indexOf('STARTER');
+        stringEndIndex = step4.indexOf('ENDING');
 
-    var checkMethod = await inbox.check();
+        addString = step4.substring( stringStartIndex+7, stringEndIndex );
+        stringArray.add( addString );
+        step4 = step4.substring(stringEndIndex + 6 );
+      }
 
+      // Add Elements in String Array to Single String
+      String printableString ='';
+      stringArray.forEach( (element) {        
+        printableString = printableString + enoughMail.EncodingsHelper.decodeBase64(element, convert.utf8);
+      } );  
 
-    var i = 7;
+      return printableString;
 
-    Map<int, Map<String, dynamic>> subject =  await inbox.fetch(["BODY.PEEK[HEADER.FIELDS (SUBJECT)]"],messageIds: [i]);    
+    } else {
+      return data;
+    }
 
-    var mapSubjectEmail = subject[i];
-    print(mapSubjectEmail);
-    var mapEmail = mapSubjectEmail.values;
-    print(mapEmail);
-    var subjectEmail = mapEmail.first as String;
-
-    Map<int, Map<String, dynamic>> from =  await inbox.fetch(["BODY.PEEK[HEADER.FIELDS (From)]"],messageIds: [i]);
-    print(from);
-
-    var body = await inbox.fetch(["RFC822.TEXT"], messageIds: [i]);
-    print(['body: HEEE', body]);
-
-
-    print('.');
-    print('.');
-    print('.');
-
-    var body2 = await inbox.fetch(['BODY'], messageIdRanges: ['7']);
-    print(body2);
-
-    // var inboxFolder = await inbox.getFolder('inbox', readOnly: true);
-    // print([ 'inboxFolder', inboxFolder. ]);
+  } // End of handleFetchedComplexBase64
 
 
-  }
+  
 
   String handleFetchedSubject (String data) {
 
@@ -302,123 +368,224 @@ testVar3.result.toString()
   }
 
 
-  Future<void> getMailsByImapClient2 () async { 
-    var client = new imapClient.ImapClient();
-    // connect
-    await client.connect(incomingServer2, portNo2, true);
-    // print(['resultTest1', resultTest1]);
-    // authenticate
-    await client.login(mailAddress2, mailPassword2);
-    // get folder
-    var inbox = await client.getFolder("inbox");
+  
 
 
-    print(['mailCount: ', inbox.mailCount]);
-    print(['unseenCount: ', inbox.unseenCount]);
+  Future<void> getEnoughMails (
+    //  enoughMail.ImapClient client 
+    ) async {
 
+    print('GET ENOUGH MAILS');
 
-    var i = 7;
-
-    // Single "Subject" with Message id (int)    Status: OK
-    // Map<int, Map<String, dynamic>> subject =  await inbox.fetch(["BODY.PEEK[HEADER.FIELDS (SUBJECT)"],messageIdRanges: ['1:10']); 
-    // print(["THIS IS SuBjEcT", subject]);
-
-
-    var printList = [];
-
-    // print('-------------Starting Transform-----------');
-
-    // // Mapping Fetched "SUBJECT" Data
-    // subject.forEach( (indexNo, data1) {
-    //   data1.forEach(( definition, data2  ) {
-
-    //     // print(handleFetchedSubject(data2));
-
-    //     printList.add( handleFetchedSubject(data2)  );
-
-
-    //   });
-    // } );
-
-    // print('-------------END OF Transform-----------');
-
-    toBePrinted = printList.toString();
-
-
-
-    // Fetch "From" 
-    Map<int, Map<String, dynamic>> from =  await inbox.fetch(["BODY.PEEK[HEADER.FIELDS (From)]"],messageIdRanges: ['1:10']); 
-    // print(["THIS IS FroM anD DaTe", fromAndDate]);
-
-
-    // // Mapping Fetched "From" Data  WORKING
-    // from.forEach( (indexNo, data1) {
-    //   data1.forEach(( definition, data2  ) {
-    //     print( handleFetchedFrom(data2) );
-    //   });
-    // } );
-
-
-    // Fetch "Date"
-    // Map<int, Map<String, dynamic>> date =  await inbox.fetch(["BODY.PEEK[HEADER]"],messageIdRanges: ['1:10']); 
-    Map<int, Map<String, dynamic>> date =  await inbox.fetch(["BODY.PEEK[HEADER.FIELDS (Date Delivery-date)]"],messageIdRanges: ['1:10']); 
-    // print(["THIS IS OnlY DaTe", date]);
-
-
-    // // Mapping Fetched "Date" Data
-    // date.forEach( (indexNo, data1) {
-    //   data1.forEach(( definition, data2  ) {  
-
-    //     print(handleFetchedDate(data2));        
-
-    //   });
-    // } );
-
-
-
-
-
-
-
-
-
-
-
-
-
+    var client  = enoughMail.ImapClient(isLogEnabled: true);
+    // await client.connectToServer(incomingServer1, portNo1, isSecure: true);
+    // var loginResponse = await client.login(mailAddress1, mailPassword1);
+    // var client  = enoughMail.ImapClient(isLogEnabled: true);
+    await client.connectToServer(incomingServer2, portNo2, isSecure: true);
+    var loginResponse = await client.login(mailAddress2, mailPassword2);
+    if (  !loginResponse.isOkStatus ) {
+      print('Auth Error');
+      return;
+    }
     
+    
+      var listResponse = await client.listMailboxes();
+      if (listResponse.isOkStatus) {
+
+        // print('mailboxes: ${listResponse.result}');
+
+
+        // Necessary PATTERN
+        // print('mailboxes: ${listResponse.result[0].name}');
+        // print('mailboxes: ${listResponse.result[0].path}');
+        // print(listResponse.result.length);
+
+      //  print( await client.examineMailbox(listResponse.result[0]));
+
+
+      // Select MailBox
+      await client.selectMailbox( listResponse.result[0]);
+
+      // Mail Count
+      final mailCount = listResponse.result[0].messagesExists;
+
+
+      // await fetchSubjects( client, 1,  mailCount);
+      // await fetchDate( client, 1,  mailCount);
+      await fetchHeaderFields( client, 1,  mailCount);
+
+
+      // Get Single "test"
+      // var testVar = await client.fetchMessages(1, 1, 'ENVELOPE');
+      // print(testVar.result);
+
+      // var testVar2 = await client.fetchMessages(2, 2, 'BODY[]');
+      // print(testVar2.result);
+
+      
+      
 
 
 
-    // Single "From" with Message id (int)   Status: OK
-    // Map<int, Map<String, dynamic>> from =  await inbox.fetch(["BODY.PEEK[HEADER.FIELDS (From)]"],messageIds: [i]);
-    // print([ "THIS IS FroM"  ,from]);
 
-    // Multiple "From" with Message id Range (int) Status: OK
-    // Map<int, Map<String, dynamic>> from2 =  await inbox.fetch(["BODY.PEEK[HEADER.FIELDS (From)]"], messageIdRanges: ['1:6']);
-    // print([ "THIS IS FroM with Range"  ,from2]);
+      
 
-    // Single "Content" with Message id (int)   Status: OK
-    // var body = await inbox.fetch(["RFC822.TEXT"], messageIds: [1]);
-    // print(['This IS  Content', body]);
+  
+      }
+    
+  } // end of getEnoughMails
 
-    // Single "Content" with Message id (int)  Usttekiyle ayni.
-    // var body2 = await inbox.fetch(["BODY[TEXT]"], messageIds: [1]);
-    // print(['This IS  Content2', body2]);
+  Future<List<String>> fetchSubjects ( 
+
+    enoughMail.ImapClient client,
+    int firstIndex,
+    int lastIndex
+   ) async {
+    List<String> subjectList =[];
+     
+    var subject = await client.fetchMessages(1, 10, "BODY.PEEK[HEADER.FIELDS (SUBJECT)]");
+    var mappedData = subject.result;
+    // Mapping Fetched "SUBJECT" Data
+    mappedData.forEach( (item) {
+      subjectList.add(
+        handleFetchedComplexBase64(item.headers[0].value)
+      );
+    } );
+
+    print(subjectList);
+    return subjectList;
+  }  // End of fetchSubjects
 
 
+  Future<List<String>> fetchDate ( 
+    enoughMail.ImapClient client,
+    int firstIndex,
+    int lastIndex
+   ) async {
+    List<String> dateList =[];
 
-    notifyListeners();
+    var dates = await client.fetchMessages(1, 10, "BODY.PEEK[HEADER.FIELDS (Date Delivery-date)]");
+    var mappedData = dates.result;
+    // Mapping Fetched "Date Delivery-date" Data
+    mappedData.forEach( (item) {
+      String deliveryDate;
+      String date;
+      String dateError = 'DateError';
+
+      // Iterate Headers of Items
+      item.headers.forEach( (headerItem) {
+        if( headerItem.name == 'Date') {
+          date = headerItem.value;
+        } else if(headerItem.name == 'Delivery-date') {
+          deliveryDate = headerItem.value;
+        } else {
+          print('Date not found');
+        }
+      } );
+      // Add Date to List
+      if( date != null ) {
+        dateList.add(date);
+      } else if( deliveryDate != null ) {
+        dateList.add(deliveryDate);
+      } else {
+        dateList.add(dateError);      
+      }
+
+    } );
+
+    // print(dateList);
+    return dateList;
+  }  // End of fetchSubjects
 
 
-
-
-
-    // print('Öğretmen 3. Bölüm - FOX');
-
-
+  String handleSelectDate  ( {
+    String date,
+    String deliveryDate
+  }  ) {
+    if( date != null ) {
+      return date;
+    } else if( deliveryDate != null ) {
+      return deliveryDate;
+    } else {
+      print( 'Date Error' );
+      return 'DateError';
+    }
 
   }
 
 
+
+  Future<List<Map<String, String>>> fetchHeaderFields ( 
+    enoughMail.ImapClient client,
+    int firstIndex,
+    int lastIndex
+   ) async {
+    List<Map<String, String>> headerFieldsList =[];
+
+    // var dates = await client.fetchMessages(1, 10, "BODY.PEEK[HEADER]");
+    var dates = await client.fetchMessages(
+      firstIndex, 
+      lastIndex, 
+      "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
+    );
+    var mappedData = dates.result;
+    // Mapping Fetched "Date Delivery-date" Data
+
+    // print(mappedData);
+
+    mappedData.forEach( (mimeItem) {
+      String contentType;
+      String from;
+      String subject;
+      String date;
+      String deliveryDate;
+
+      mimeItem.headers.forEach( ( headersItem ) {
+        switch ( headersItem.name ) {
+          case  'Content-Type' : 
+            contentType = headersItem.value;
+            break;
+          case  'From' : 
+            from = headersItem.value;
+            break;
+          case  'Subject' : 
+            subject = headersItem.value;
+            break;
+          case  'Date' : 
+            date = headersItem.value;
+            break;
+          case  'Delivery-date' : 
+            deliveryDate = headersItem.value;
+            break;
+          
+          default:
+            print( 'INTERESTING HEADER: ' + headersItem.value );
+        }
+      } );
+
+      headerFieldsList.add( {
+        'Subject': handleFetchedComplexBase64(subject),
+        'From': from,
+        'Date': handleSelectDate( 
+          date: date,
+          deliveryDate: deliveryDate
+        ),
+        'Content=Type': contentType
+      });  
+    } ); // End of Iterating over each Mime
+
+
+    print(' --------------LETS SEE OUR DATA ---------------------------------------------');
+    print( headerFieldsList );
+    return headerFieldsList;
+    
+  }  // End of fetchSubjects
+
 }
+
+
+
+
+
+
+

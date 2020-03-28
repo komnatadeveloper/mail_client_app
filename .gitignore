@@ -42,3 +42,4 @@ app.*.symbols
 
 # Local Environment Variables
 lib/local_environment
+lib/environment
