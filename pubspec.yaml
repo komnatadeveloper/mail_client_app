@@ -25,6 +25,9 @@ dependencies:
   http: ^0.12.0+4
   enough_mail: ^0.0.6  # ise yaramadi
 
+  # For parsing DateTime response of IMAP Client
+  jiffy: ^3.0.1
+
   shared_preferences: ^0.5.6+3
 
   # pedantic: ^1.9.0

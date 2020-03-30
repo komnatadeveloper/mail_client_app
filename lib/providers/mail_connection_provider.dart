@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart' as intl;
+import 'package:jiffy/jiffy.dart' as jiffyPackage;
 
 // For http requests http.dart & convert for json.decode & json.encode
 // import 'package:http/http.dart' as http;
@@ -40,8 +42,25 @@ class MailConnectionProvider with ChangeNotifier {
   String get preferredView {
     return _preferredView;
   }
+
   dynamic get headersList {
-    return _headersList;
+    // var tempList = _headersList as List<Map<String, Object>>;
+    List<Map<String, Object>> returnList = [];
+
+    // Transform Date String
+    _headersList.forEach( (item) {
+      var dateString = item['Date'] as String;
+      print(dateString);
+      var jiffy = jiffyPackage.Jiffy(dateString, 'EEE, dd MMM yyyy hh:mm:ss');
+
+      returnList.add({
+        'Date': intl.DateFormat('yyyy/MM/dd').format( jiffy.dateTime ),
+        'Subject': item['Subject'],
+        'From': item['From'],
+      });
+
+    } );
+    return returnList;
   }
 
 
@@ -82,6 +101,8 @@ class MailConnectionProvider with ChangeNotifier {
 
   // Add Account
   Future<void> addAccount ( EmailAccount newAccount) async {
+
+
 
     if( true ) {
       getEnoughMails();
@@ -411,7 +432,12 @@ testVar3.result.toString()
 
       // await fetchSubjects( client, 1,  mailCount);
       // await fetchDate( client, 1,  mailCount);
-      final tempHeadersList = await fetchHeaderFields( client, 1,  mailCount);
+
+      final tempHeadersList = await fetchHeaderFields( 
+        client, 
+        1,  
+        mailCount <= 50 ? mailCount : 50
+      );
 
       _headersList = [...tempHeadersList];
 
@@ -524,13 +550,13 @@ testVar3.result.toString()
     List<Map<String, String>> headerFieldsList =[];
 
     // var dates = await client.fetchMessages(1, 10, "BODY.PEEK[HEADER]");
-    var dates = await client.fetchMessages(
+    var rawResponse = await client.fetchMessages(
       firstIndex, 
       lastIndex, 
       "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
     );
-    var mappedData = dates.result;
-    // Mapping Fetched "Date Delivery-date" Data
+    var mappedData = rawResponse.result;
+
 
     // print(mappedData);
 
