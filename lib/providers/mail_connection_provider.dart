@@ -1,21 +1,23 @@
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:jiffy/jiffy.dart' as jiffyPackage;
+import 'package:enough_mail/enough_mail.dart' as enoughMail;
 
 // For http requests http.dart & convert for json.decode & json.encode
 // import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
-import 'package:enough_mail/enough_mail.dart' as enoughMail;
 
+import 'package:mail_client_app/models/email_item_model.dart';
 
 // import 'package:imap_client/imap_client.dart' as imapClient;
 
 import "../environment/vars.dart";
 // import 'package:mail_client_app/environment/vars.dart';
 import '../models/email_account.dart';
+import '../models/email_item_model.dart';
 
 
 
@@ -23,13 +25,29 @@ import '../models/email_account.dart';
 
 class MailConnectionProvider with ChangeNotifier { 
 
-  List<enoughMail.ImapClient> clientList = [];
+
+  final List<enoughMail.ImapClient> clientList;
+  List<EmailItemModel> emailList;
+
+  MailConnectionProvider( {
+    this.clientList,
+    this.emailList
+  });
+
+
+  bool _isInitialised = false;
+  bool _isInitialising = true;
+
   var _isImapClientLogin = false;
   int _accountCount;
   String _preferredMail;
   String _preferredView;
   dynamic _headersList = [];   // dynamic to be changed in future
+  bool _isLoadingIncoming = false;
 
+  bool get isInitialising {
+    return _isInitialising;
+  }
   bool get isImapClientLogin {
     return _isImapClientLogin;
   }
@@ -43,60 +61,76 @@ class MailConnectionProvider with ChangeNotifier {
     return _preferredView;
   }
 
-  dynamic get headersList {
+  List<Map<String, Object>> get headersList {
     // var tempList = _headersList as List<Map<String, Object>>;
     List<Map<String, Object>> returnList = [];
 
     // Transform Date String
-    _headersList.forEach( (item) {
-      var dateString = item['Date'] as String;
-      print(dateString);
+    emailList.forEach( (emailItem) {
+      var dateString = emailItem.header.date;
       var jiffy = jiffyPackage.Jiffy(dateString, 'EEE, dd MMM yyyy hh:mm:ss');
 
       returnList.add({
         'Date': intl.DateFormat('yyyy/MM/dd').format( jiffy.dateTime ),
-        'Subject': item['Subject'],
-        'From': item['From'],
+        'Subject': emailItem.header.subject,
+        'From': emailItem.header.from,
       });
 
     } );
     return returnList;
   }
 
+  bool get isLoadingIncoming {
+    return _isLoadingIncoming;
+  }
+  bool get isInitialised {
+    return _isInitialised;
+  }
+
+  // ---------End of Getters-----
+
+
 
 
   String toBePrinted = 'Empty';
 
 
-  // Get Initial Data From DB
-  Future<void> getInitDataFromDb ()  async{
-    final prefs = await SharedPreferences.getInstance();
-
-    // If First Use of App
-    if(  !prefs.containsKey( 'komnataMailClient' ) ) {      
-      final logToAdd = convert.json.encode( { 
-        'accountList': [],
-        'preferredView': 'inbox',  //  'inbox' 'sent' 'viewed' 'archieve' 'trash'
-        'preferredMail': 'all'  // "mailAddress" or "all"
-      });
-      prefs.setString('komnataMailClient', logToAdd);
-
-      _accountCount = 0;
-      _preferredMail = 'inbox';
-      _preferredView = 'all';
+  int counter = 0;
 
 
-    } else {
-      final extractedUserData = convert.json.decode(
-        prefs.getString('komnataMailClient')
-      ) as Map<String, Object>;
+  Future<void> getAllHeaders() async {
+    print( 'getAllHeaders Method is Beginning' );
+    print("Client has ${clientList.length} items");
+    if( clientList.length > 0) {
 
-      final tempAccountList = extractedUserData['accountList'] as List;
-      _accountCount = tempAccountList.length;
-      _preferredMail = extractedUserData['preferredMail'];
-      _preferredView = extractedUserData['preferredView'];
+      for(  int i = 0; i < clientList.length; i++) {
+        await getHeaders( clientList[i] );
+      }
+
     }
-  }  // End of getInitDataFromDb
+    notifyListeners();
+    print( 'getAllHeaders Method has Ended' );
+
+  }
+
+  Future<void> getAllHeadersOnMainDart() async {
+    print( 'getAllHeaders Method is Beginning' );
+    if( clientList.length > 0) {
+      clientList.forEach( (clientItem) async {
+        await getHeaders(clientItem);
+      } );
+    }
+    notifyListeners();
+    print( 'getAllHeaders Method has Ended' );
+    counter++;
+    print('hetAllHeaders  ------------$counter--------------------------------------------------------------------------------------------------');
+
+  }
+
+
+
+
+  
 
 
   // Add Account
@@ -104,10 +138,10 @@ class MailConnectionProvider with ChangeNotifier {
 
 
 
-    if( true ) {
-      getEnoughMails();
-      return;
-    }
+    // if( true ) {
+    //   getEnoughMails();
+    //   return;
+    // }
 
     print(newAccount.emailAddress);
     print(newAccount.emailPassword);
@@ -388,40 +422,46 @@ testVar3.result.toString()
   }
 
 
-  
 
 
-  Future<void> getEnoughMails (
-    //  enoughMail.ImapClient client 
-    ) async {
-
-    print('GET ENOUGH MAILS');
-
+  Future<enoughMail.ImapClient> connectClientToServer (
+    EmailAccount accountToConnect
+  ) async {
     var client  = enoughMail.ImapClient(isLogEnabled: true);
     // await client.connectToServer(incomingServer1, portNo1, isSecure: true);
     // var loginResponse = await client.login(mailAddress1, mailPassword1);
     // var client  = enoughMail.ImapClient(isLogEnabled: true);
-    await client.connectToServer(incomingServer2, portNo2, isSecure: true);
-    var loginResponse = await client.login(mailAddress2, mailPassword2);
+    await client.connectToServer(
+      accountToConnect.incomingMailsServer, 
+      int.parse(accountToConnect.incomingMailsPort), 
+      isSecure: true
+    );
+    var loginResponse = await client.login(
+      accountToConnect.emailAddress, 
+      accountToConnect.emailPassword
+    );
     if (  !loginResponse.isOkStatus ) {
       print('Auth Error');
-      return;
+      return null;
+    } else {
+      clientList.add(client);
+      notifyListeners();
+      print('Client ${accountToConnect.emailAddress} has been added to clientList');
+      return client;
     }
-    
-    
-      var listResponse = await client.listMailboxes();
-      if (listResponse.isOkStatus) {
-
-        // print('mailboxes: ${listResponse.result}');
+  }
+  
 
 
-        // Necessary PATTERN
-        // print('mailboxes: ${listResponse.result[0].name}');
-        // print('mailboxes: ${listResponse.result[0].path}');
-        // print(listResponse.result.length);
+  Future<void> getHeaders (
+     enoughMail.ImapClient client 
+    ) async {
 
-      //  print( await client.examineMailbox(listResponse.result[0]));
-
+    print('GET ENOUGH HEADERS');
+    // print(client);
+    // List Mailboxes
+    var listResponse = await client.listMailboxes();
+    if (listResponse.isOkStatus) {
 
       // Select MailBox
       await client.selectMailbox( listResponse.result[0]);
@@ -430,37 +470,20 @@ testVar3.result.toString()
       final mailCount = listResponse.result[0].messagesExists;
 
 
-      // await fetchSubjects( client, 1,  mailCount);
-      // await fetchDate( client, 1,  mailCount);
-
-      final tempHeadersList = await fetchHeaderFields( 
+      final tempEmailsList = await fetchHeaderFields( 
         client, 
         1,  
         mailCount <= 50 ? mailCount : 50
       );
 
-      _headersList = [...tempHeadersList];
 
-
-      // Get Single "test"
-      // var testVar = await client.fetchMessages(1, 1, 'ENVELOPE');
-      // print(testVar.result);
-
-      // var testVar2 = await client.fetchMessages(2, 2, 'BODY[]');
-      // print(testVar2.result);
-
-      
-      
-
-
-
-
-      
-
-  
-      }
+      emailList = [ ...tempEmailsList ]; 
+      // notifyListeners();   
+    } 
     
   } // end of getEnoughMails
+
+
 
   Future<List<String>> fetchSubjects ( 
 
@@ -542,12 +565,12 @@ testVar3.result.toString()
 
 
 
-  Future<List<Map<String, String>>> fetchHeaderFields ( 
+  Future<List<EmailItemModel>> fetchHeaderFields ( 
     enoughMail.ImapClient client,
     int firstIndex,
     int lastIndex
    ) async {
-    List<Map<String, String>> headerFieldsList =[];
+    List<EmailItemModel> fetchedEmailHeaderList =[];
 
     // var dates = await client.fetchMessages(1, 10, "BODY.PEEK[HEADER]");
     var rawResponse = await client.fetchMessages(
@@ -590,21 +613,32 @@ testVar3.result.toString()
         }
       } );
 
-      headerFieldsList.add( {
-        'Subject': handleFetchedComplexBase64(subject),
-        'From': from,
-        'Date': handleSelectDate( 
+      var emailHeader = EmailHeader(
+        subject: handleFetchedComplexBase64(subject),
+        from: from,
+        date: handleSelectDate( 
           date: date,
           deliveryDate: deliveryDate
         ),
-        'Content=Type': contentType
-      });  
+      );
+
+      // headerFieldsList.add( {
+      //   'Subject': handleFetchedComplexBase64(subject),
+      //   'From': from,
+      //   'Date': handleSelectDate( 
+      //     date: date,
+      //     deliveryDate: deliveryDate
+      //   ),
+      //   'Content=Type': contentType
+      // });  
+      fetchedEmailHeaderList.add( EmailItemModel(
+        header: emailHeader
+      ) );
+
     } ); // End of Iterating over each Mime
 
 
-    print(' --------------LETS SEE OUR DATA ---------------------------------------------');
-    print( headerFieldsList );
-    return headerFieldsList;
+    return fetchedEmailHeaderList;
     
   }  // End of fetchSubjects
 

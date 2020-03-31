@@ -12,49 +12,59 @@ class IncomingMails  extends StatelessWidget {
 
   // final List<IncomingMailItem> incomingMailsList;
   final Size appBarPreferredHeight;
-
   IncomingMails( this.appBarPreferredHeight );
 
 
 
-  
-
 
   @override
   Widget build(BuildContext context) {
-    var mailConnectionProvider = Provider.of<MailConnectionProvider>(context);
+    // var mailConnectionProvider = Provider.of<MailConnectionProvider>(context);
 
     return LayoutBuilder(
       builder: (ctx, constraints) {
         return Container(
-          height: ( MediaQuery.of(context).size.height - appBarPreferredHeight.height - MediaQuery.of(context).padding.top - 24 ),
+          height: ( MediaQuery.of(context).size.height 
+            - appBarPreferredHeight.height 
+            - MediaQuery.of(context).padding.top - 24 
+          ),
 
-          child: ListView.builder(
-            itemBuilder: ( ctx, index ) {
-
-              return Container(
-                width: double.infinity,
-                padding: EdgeInsets.only(
-                  bottom: 0,
-                  top: 0,
+          child: Consumer<MailConnectionProvider>(
+            builder: ( ctx, mailConnectionProvider, child ) => mailConnectionProvider.headersList.length == 0
+              ? Center(
+                child: Text(
+                  'No Mails',
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.title.color
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1.0, color: Colors.white)
-                ),
+              )
+              : ListView.builder(
+                itemBuilder: ( ctx, index ) {
+
+                  return Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.only(
+                      bottom: 0,
+                      top: 0,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 1.0, color: Colors.white)
+                    ),
 
 
-                child: MailItem( mailConnectionProvider.headersList[index] ),
-                  
+                    child: MailItem( mailConnectionProvider.headersList[index] ),
+                      
 
-              );
-            },
-            itemCount: mailConnectionProvider.headersList.length,
+                  );
+                },
+                itemCount: mailConnectionProvider.headersList.length,
+              )
+              
           )
-
         );
       }
     );
-
   }
 }
 

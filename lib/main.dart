@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import './providers/mail_connection_provider.dart';
+import './providers/clients_provider.dart';
 
 
 import './screens/incoming_mails/incoming_mails_screen.dart';
 import './screens/accounts/accounts_screen.dart';
 import './screens/settings/settings_screen.dart';
+import './screens/splash_screen.dart';
 import './screens/add_exchange_account/add_exchange_account_screen.dart';
 
 
@@ -18,13 +20,63 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+
+
         ChangeNotifierProvider.value(
-          value: MailConnectionProvider()
+          value: ClientsProvider()
+        ),
+
+        ChangeNotifierProxyProvider<ClientsProvider, MailConnectionProvider>(
+          create: ( ctx ) => MailConnectionProvider( 
+            clientList: [],
+            emailList: []  
+          ),
+          update: ( _, clientsProvider, previosMailConnectionProvider ) => MailConnectionProvider(
+            clientList: clientsProvider.clientList,
+            emailList: previosMailConnectionProvider.emailList
+          )
+
         )
         
       ],
 
-      child: MaterialApp(
+      child: VarMaterialApp()
+
+      
+    );
+    
+    
+  }
+}
+
+
+class VarMaterialApp extends StatefulWidget {
+  @override
+  _VarMaterialAppState createState() => _VarMaterialAppState();
+}
+
+// STATE
+class _VarMaterialAppState extends State<VarMaterialApp> {
+
+  var _isInited = false;
+
+  @override
+  void initState() {
+    Provider.of<ClientsProvider>(
+      context,
+      listen: false
+    ).initialiseApp()
+      .then( ( _ )  {
+        setState((){
+          _isInited = true;
+        });
+      });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
         title: 'MailClientApp',
         theme: ThemeData(
           // primarySwatch: Colors.black.[400],
@@ -40,22 +92,20 @@ class MyApp extends StatelessWidget {
           ),
           backgroundColor: Color.fromARGB(240, 20, 20, 20)
         ),
-        home: IncomingMailsScreen(),
+        // home: IncomingMailsScreen(),
+        home: Consumer<ClientsProvider>(
+          builder: ( ctx, clientsProvider, _ ) => clientsProvider.isInitialising
+            ? SplashScreen( 'Initialising...' )
+            : IncomingMailsScreen()
+
+        ),
         routes: {
           SettingsScreen.routeName : (ctx) => SettingsScreen(),
           IncomingMailsScreen.routeName : (ctx) => IncomingMailsScreen(),
           AccountsScreen.routeName : (ctx) => AccountsScreen(),
           AddExchangeAccountScreen.routeName : (ctx) => AddExchangeAccountScreen(),
-
         }
-      )   //Material App,
-
-      
-    );
-      
-    
-    
-    
+      ); 
   }
 }
 

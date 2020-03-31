@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../temporary_files/incoming_dummy_mails.dart';
+
+import '../../providers/mail_connection_provider.dart';
+import '../../providers/clients_provider.dart';
 
 
 import '../../layout/app_drawer/app_drawer.dart';
@@ -89,9 +93,12 @@ class IncomingMailsScreen extends StatefulWidget {
   _IncomingMailsScreenState createState() => _IncomingMailsScreenState();
 }
 
+
+// STATE
 class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
 
   final List<IncomingMailItem> _incomingMailList = dummyIncomingList;
+  var _isInited = false;
 
 
   // Widget iconButton ( BuildContext ctx)   {
@@ -102,6 +109,21 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
   //     },
   //   );
   // }
+
+  @override
+  void didChangeDependencies() {
+    
+    if(!_isInited && !Provider.of<ClientsProvider>(context).isInitialising  ) {
+      print('Get All Headers Call Inside Incoming Mails Screen');
+      Provider.of<MailConnectionProvider>(context, listen: false).getAllHeaders()
+        .then( (_) {
+          setState(() {
+            _isInited = true;
+          });
+        });        
+    }
+    super.didChangeDependencies();
+  }
   
 
   @override
@@ -158,7 +180,15 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
           
             
           children: <Widget>[
-            IncomingMails( varAppBar.preferredSize )
+
+            _isInited 
+              ? IncomingMails( varAppBar.preferredSize ) 
+              : Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+              
 
           ],
 
