@@ -193,11 +193,7 @@ class ClientsProvider with ChangeNotifier {
           int.parse(account.incomingMailsPort), 
           isSecure: true
         );
-        // await client.connectToServer(
-        //   'mail.pcgaziantep.com', 
-        //   993, 
-        //   isSecure: true
-        // );
+
         var loginResponse = await client.login(
           account.emailAddress, 
           account.emailPassword
