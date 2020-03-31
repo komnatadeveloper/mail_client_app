@@ -476,8 +476,9 @@ testVar3.result.toString()
         mailCount <= 50 ? mailCount : 50
       );
 
-
-      emailList = [ ...tempEmailsList ]; 
+      for (int i = 0; i < tempEmailsList.length; i++) {
+        emailList.add(tempEmailsList[i]);
+      }
       // notifyListeners();   
     } 
     
