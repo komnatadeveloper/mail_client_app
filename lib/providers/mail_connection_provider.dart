@@ -338,6 +338,59 @@ testVar3.result.toString()
 
       return printableString;
 
+
+    } else if( data.toString().contains('=?UTF-8?Q?') || data.toString().contains('=?utf-8?Q?')  ) {
+
+      print('   ISE YARAYACAK MI BAKALIMMMMMM-----------------------------------------------------------');
+      var datatoHandle = data.toString();
+      print(datatoHandle);
+
+      // Transform String
+
+      var step1 = datatoHandle.replaceAll('?= =?utf-8?Q?', 'ENDINGSTARTER');
+      step1 = step1.replaceAll('=?utf-8?Q?', 'STARTER');
+      step1 =step1.replaceAll('?= =?UTF-8?Q?', 'ENDINGSTARTER');
+      step1 = step1.replaceAll('=?UTF-8?Q?', 'STARTER');
+      step1 = step1.replaceAll('==?=', 'ENDING'); 
+      step1 = step1.replaceAll('?=', 'ENDING'); 
+            
+
+      List<String> stringArray = [];
+      int stringStartIndex;
+      int stringEndIndex;
+      String addString;
+
+      // Creating Strings Array
+      while( step1.contains('STARTER')  ) {
+        stringStartIndex = step1.indexOf('STARTER');
+        stringEndIndex = step1.indexOf('ENDING');
+
+        // If there is some "not encoded" text at the beginning
+        if(stringStartIndex >= 0) {
+          stringArray.add( step1.substring(0, stringStartIndex)  );
+        }
+
+        addString = enoughMail.EncodingsHelper.decodeQuotedPrintable(
+          step1.substring( stringStartIndex+7, stringEndIndex ),
+          convert.utf8
+        );
+        stringArray.add( addString );
+        step1 = step1.substring(stringEndIndex + 6 );
+      }
+
+      // If there is some "not encoded" text at the END
+      if(step1.length > 0) {
+        stringArray.add(step1);
+      }
+
+      // Add Elements in String Array to Single String
+      String printableString ='';
+      stringArray.forEach( (element) {        
+        printableString = printableString + element;
+      } );  
+      print(printableString);
+      return printableString;
+
     } else {
       return data;
     }
@@ -388,7 +441,7 @@ testVar3.result.toString()
 
       return printableString;
 
-    } else {
+    }  else {
       return phase1;
     }
 
@@ -577,12 +630,14 @@ testVar3.result.toString()
     var rawResponse = await client.fetchMessages(
       firstIndex, 
       lastIndex, 
-      "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
+      // "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
+      "BODY.PEEK[HEADER]"
     );
     var mappedData = rawResponse.result;
 
 
     // print(mappedData);
+    print('---------------------------------------------MANIPULATE FETCHED DATAS in fetchHeaderFields Method---------------------------------');
 
     mappedData.forEach( (mimeItem) {
       String contentType;
@@ -590,6 +645,12 @@ testVar3.result.toString()
       String subject;
       String date;
       String deliveryDate;
+
+      // Answer of enoughMail Github Issue
+      // mimeItem.parse();
+      // print(mimeItem);
+
+      
 
       mimeItem.headers.forEach( ( headersItem ) {
         switch ( headersItem.name ) {
@@ -613,6 +674,11 @@ testVar3.result.toString()
             print( 'INTERESTING HEADER: ' + headersItem.value );
         }
       } );
+      // print(subject);  // FOR TEST
+      // print('TRY TO SOLVE BY PARSE METHOD');
+      // mimeItem.bodyRaw;
+      // print(mimeItem.decodeContentText());
+      
 
       var emailHeader = EmailHeader(
         subject: handleFetchedComplexBase64(subject),
@@ -622,6 +688,7 @@ testVar3.result.toString()
           deliveryDate: deliveryDate
         ),
       );
+      print(emailHeader.subject);  // FOR TEST
 
       // headerFieldsList.add( {
       //   'Subject': handleFetchedComplexBase64(subject),
