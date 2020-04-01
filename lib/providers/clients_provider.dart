@@ -33,6 +33,9 @@ class ClientsProvider with ChangeNotifier {
   bool get isInitialising {
     return _isInitialising;
   }
+  List<EmailAccount> get emailAccountList {
+    return _emailAccountList;
+  }
   bool get isImapClientLogin {
     return _isImapClientLogin;
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../screens/settings/settings_screen.dart';
+import '../../providers/clients_provider.dart';
 
+import '../../screens/settings/settings_screen.dart';
+import './incoming_account_item.dart';
 
 
 
@@ -21,6 +23,8 @@ class AppDrawer extends StatelessWidget {
           child: Container(
             child: Column(
               children: <Widget>[
+
+                // Incoming Row
                 Container(
                   padding: EdgeInsets.only(
                     top: 12
@@ -61,64 +65,80 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      'komnatadeveloper@gmail.com',
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.title.color
-                      ),
+                Consumer<ClientsProvider>(
+                  builder: ( ctx2, clientsProvider, child ) => Container(
+                    height: clientsProvider.emailAccountList.length * 55.0,
+                    child: ListView.builder(
+                      itemCount: clientsProvider.emailAccountList.length,
+                      itemBuilder: (ctx2, index) {
+                        return IncomingAccountItem(
+                          clientsProvider.emailAccountList[index].emailAddress,
+                          '50'  // To be Done dynamically
+                        );
+                      },
                     ),
-                    Chip(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 0
-                      ),
-                      label: Text(
-                        '25',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Theme.of(context).textTheme.title.color
-                        ),
-                      ),
-                      labelPadding: EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 0
-                      ),
-                      backgroundColor: Colors.blue,
-                    )
-                  ],
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      'komnatadeveloper@gmail.com',
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.title.color
-                      ),
-                    ),
-                    Chip(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 0
-                      ),
-                      label: Text(
-                        '25',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Theme.of(context).textTheme.title.color
-                        ),
-                      ),
-                      labelPadding: EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 0
-                      ),
-                      backgroundColor: Colors.blue,
-                    )
-                  ],
-                ),
+
+
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: <Widget>[
+                //     Text(
+                //       'komnatadeveloper@gmail.com',
+                //       style: TextStyle(
+                //         color: Theme.of(context).textTheme.title.color
+                //       ),
+                //     ),
+                //     Chip(
+                //       padding: EdgeInsets.symmetric(
+                //         horizontal: 15,
+                //         vertical: 0
+                //       ),
+                //       label: Text(
+                //         '25',
+                //         style: TextStyle(
+                //           fontSize: 10,
+                //           color: Theme.of(context).textTheme.title.color
+                //         ),
+                //       ),
+                //       labelPadding: EdgeInsets.symmetric(
+                //         horizontal: 0,
+                //         vertical: 0
+                //       ),
+                //       backgroundColor: Colors.blue,
+                //     )
+                //   ],
+                // ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: <Widget>[
+                //     Text(
+                //       'komnatadeveloper@gmail.com',
+                //       style: TextStyle(
+                //         color: Theme.of(context).textTheme.title.color
+                //       ),
+                //     ),
+                //     Chip(
+                //       padding: EdgeInsets.symmetric(
+                //         horizontal: 15,
+                //         vertical: 0
+                //       ),
+                //       label: Text(
+                //         '25',
+                //         style: TextStyle(
+                //           fontSize: 10,
+                //           color: Theme.of(context).textTheme.title.color
+                //         ),
+                //       ),
+                //       labelPadding: EdgeInsets.symmetric(
+                //         horizontal: 0,
+                //         vertical: 0
+                //       ),
+                //       backgroundColor: Colors.blue,
+                //     )
+                //   ],
+                // ),
 
                 Row(
                   children: <Widget>[
