@@ -65,6 +65,7 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
 
+                // List of Incoming Mails
                 Consumer<ClientsProvider>(
                   builder: ( ctx2, clientsProvider, child ) => Container(
                     height: clientsProvider.emailAccountList.length * 55.0,
@@ -79,66 +80,7 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ),
                 ),
-
-
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: <Widget>[
-                //     Text(
-                //       'komnatadeveloper@gmail.com',
-                //       style: TextStyle(
-                //         color: Theme.of(context).textTheme.title.color
-                //       ),
-                //     ),
-                //     Chip(
-                //       padding: EdgeInsets.symmetric(
-                //         horizontal: 15,
-                //         vertical: 0
-                //       ),
-                //       label: Text(
-                //         '25',
-                //         style: TextStyle(
-                //           fontSize: 10,
-                //           color: Theme.of(context).textTheme.title.color
-                //         ),
-                //       ),
-                //       labelPadding: EdgeInsets.symmetric(
-                //         horizontal: 0,
-                //         vertical: 0
-                //       ),
-                //       backgroundColor: Colors.blue,
-                //     )
-                //   ],
-                // ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: <Widget>[
-                //     Text(
-                //       'komnatadeveloper@gmail.com',
-                //       style: TextStyle(
-                //         color: Theme.of(context).textTheme.title.color
-                //       ),
-                //     ),
-                //     Chip(
-                //       padding: EdgeInsets.symmetric(
-                //         horizontal: 15,
-                //         vertical: 0
-                //       ),
-                //       label: Text(
-                //         '25',
-                //         style: TextStyle(
-                //           fontSize: 10,
-                //           color: Theme.of(context).textTheme.title.color
-                //         ),
-                //       ),
-                //       labelPadding: EdgeInsets.symmetric(
-                //         horizontal: 0,
-                //         vertical: 0
-                //       ),
-                //       backgroundColor: Colors.blue,
-                //     )
-                //   ],
-                // ),
+                
 
                 Row(
                   children: <Widget>[
