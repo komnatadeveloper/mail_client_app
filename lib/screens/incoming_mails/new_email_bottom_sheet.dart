@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/mail_connection_provider.dart';
 
 class NewEmailBottomSheet extends StatelessWidget {
   @override
@@ -39,7 +42,10 @@ class NewEmailBottomSheet extends StatelessWidget {
                     Icons.send,
                     color: Theme.of(context).textTheme.title.color,
                   ),
-                  onPressed: () {                  
+                  onPressed: () {  
+                    // Provider.of<MailConnectionProvider>(context, listen: false).sendEmail();
+                    // Provider.of<MailConnectionProvider>(context, listen: false).sendMailByEnough();
+                    Provider.of<MailConnectionProvider>(context, listen: false).sendMailByMailer2();
                   },
                 ), 
               ],

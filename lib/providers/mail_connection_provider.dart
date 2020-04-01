@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:jiffy/jiffy.dart' as jiffyPackage;
 import 'package:enough_mail/enough_mail.dart' as enoughMail;
+import 'package:flutter_email_sender/flutter_email_sender.dart' as emailSender;
+import 'package:mailer2/mailer.dart' as mailer2;
 
 // For http requests http.dart & convert for json.decode & json.encode
 // import 'package:http/http.dart' as http;
@@ -709,6 +711,81 @@ testVar3.result.toString()
     return fetchedEmailHeaderList;
     
   }  // End of fetchSubjects
+
+
+  Future<void> sendEmail () async {
+    print(' A TRY TO SEND EMAIL -------------------------------------------------------');
+    final emailToSend = emailSender.Email(
+      body: 'Email body',
+      subject: 'Email subject',
+      recipients: [emailTarget1],
+      cc: [emailTarget2],
+      bcc: [emailTarget2],
+      attachmentPaths: [],
+      isHTML: false,
+    );
+    await emailSender.FlutterEmailSender.send(emailToSend);
+  }
+
+  Future<void>sendMailByEnough() async {
+    var smtpClient = enoughMail.SmtpClient( mailClientDomain1 );
+
+    print( 'SMTP CLIENT CONNECT TO SERVER' );
+    var connectionResponse = await smtpClient.connectToServer(incomingServer1, portNo1, isSecure: true );
+    print( connectionResponse.message );
+    print(connectionResponse.isOkStatus ); 
+
+    print( 'SMTP CLIENT LOGIN' );
+    var loginResponse = await smtpClient.login(mailAddress1, mailPassword1);
+    print( loginResponse.message );
+    print(loginResponse.isOkStatus ); 
+
+    // var senderMailAddress = enoughMail.MailAddress( 'Test Sender', mailAddress1 );
+
+    var messageToSend = enoughMail.MimeMessage();
+    
+    print( 'SMTP CLIENT SEND MESSAGE' );
+    var sendResponse = await smtpClient.sendMessage( messageToSend );
+    print(sendResponse.message);
+    print(sendResponse);
+  }
+
+
+  Future<void> sendMailByMailer2 () async {
+
+    var options = new mailer2.SmtpOptions();
+    options.hostName = incomingServer1;
+    options.port = 465;
+    options.name = mailAddress1;
+    options.username = mailAddress1;
+    options.password = mailPassword1;
+    options.secured = true;
+    options.requiresAuthentication = true;
+
+    // Create our email transport.
+    var emailTransport = new mailer2.SmtpTransport(options);
+
+    // 'TEST NAME HERE';
+
+    var envelope = new mailer2.Envelope();
+    envelope.from = mailAddress1;
+    envelope.sender = mailAddress1;
+    envelope.recipients = [emailTarget1 , mailAddress1];
+    envelope.senderName = 'TEST NAME HERE';
+    envelope.subject = 'Test Subject';
+    envelope.text = 'This is a test mail text!';
+
+  print('NOW ITT IS TIME TO SEND EMAIL');
+  // Email it.
+  emailTransport.send(envelope)
+    .then((envelope) { 
+      print('Email sent!');
+      print(envelope.sender);
+    })
+    .catchError((e) => print('Error occurred: $e'));
+
+
+  }
 
 }
 

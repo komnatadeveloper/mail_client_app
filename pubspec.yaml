@@ -30,6 +30,9 @@ dependencies:
 
   shared_preferences: ^0.5.6+3
 
+  flutter_email_sender: ^3.0.1
+  mailer2: ^1.2.5
+
   # pedantic: ^1.9.0
 
   # imap_client: ^0.2.8
