@@ -641,7 +641,7 @@ testVar3.result.toString()
             break;
           
           default:
-            print( 'INTERESTING HEADER: ' + headersItem.value );
+            print( 'INTERESTING HEADER: ' +headersItem.name + ':' + headersItem.value );
         }
       } );
       // print(subject);  // FOR TEST
@@ -719,7 +719,7 @@ testVar3.result.toString()
   }
 
 
-  Future<void> sendMailByMailer2 () async {
+  Future<void> sendMailByMailer2 (  ) async {
 
     var options = new mailer2.SmtpOptions();
     options.hostName = incomingServer1;
@@ -742,6 +742,53 @@ testVar3.result.toString()
     envelope.senderName = 'TEST NAME HERE';
     envelope.subject = 'Test Subject';
     envelope.text = 'This is a test mail text!';
+
+  print('NOW ITT IS TIME TO SEND EMAIL');
+  // Email it.
+  emailTransport.send(envelope)
+    .then((envelope) { 
+      print('Email sent!');
+      print(envelope.sender);
+    })
+    .catchError((e) => print('Error occurred: $e'));
+
+
+  }
+
+  Future<void> sendMail ( EmailItemModel  emailItem ) async {
+
+
+
+    // var senderClient = clientList.firstWhere( 
+    //   ( item ) => item.emailAccount.emailAddress == emailItem.header.from  
+    // );
+    var senderClient = clientList[0];
+
+
+
+    var options = new mailer2.SmtpOptions();
+    options.hostName = senderClient.emailAccount.outgoingMailsServer;
+    options.port = int.parse(senderClient.emailAccount.outgoingMailsPort);
+    options.name = senderClient.emailAccount.emailAddress;
+    options.username = senderClient.emailAccount.emailAddress;
+    options.password = senderClient.emailAccount.emailPassword;
+    options.secured = true;
+    options.requiresAuthentication = true;
+
+    // Create our email transport.
+    var emailTransport = new mailer2.SmtpTransport(options);
+
+    // 'TEST NAME HERE';
+
+    var envelope = new mailer2.Envelope();
+    envelope.from = senderClient.emailAccount.emailAddress;
+    envelope.sender = senderClient.emailAccount.emailAddress;
+    envelope.recipients = emailItem.header.recipients;
+    envelope.senderName = senderClient.emailAccount.senderName == null 
+      ? 'NO NAME ENTERED' 
+      : senderClient.emailAccount.senderName;
+    envelope.subject = emailItem.header.subject;
+    envelope.text = emailItem.text;
 
   print('NOW ITT IS TIME TO SEND EMAIL');
   // Email it.
