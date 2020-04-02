@@ -68,12 +68,12 @@ class AppDrawer extends StatelessWidget {
                 // List of Incoming Mails
                 Consumer<ClientsProvider>(
                   builder: ( ctx2, clientsProvider, child ) => Container(
-                    height: clientsProvider.emailAccountList.length * 55.0,
+                    height: clientsProvider.clientList.length * 55.0,
                     child: ListView.builder(
-                      itemCount: clientsProvider.emailAccountList.length,
+                      itemCount: clientsProvider.clientList.length,
                       itemBuilder: (ctx2, index) {
                         return IncomingAccountItem(
-                          clientsProvider.emailAccountList[index].emailAddress,
+                          clientsProvider.clientList[index].emailAccount.emailAddress,
                           '50'  // To be Done dynamically
                         );
                       },

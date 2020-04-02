@@ -20,6 +20,7 @@ import "../environment/vars.dart";
 // import 'package:mail_client_app/environment/vars.dart';
 import '../models/email_account.dart';
 import '../models/email_item_model.dart';
+import '../models/client_item_model.dart';
 
 
 
@@ -28,7 +29,7 @@ import '../models/email_item_model.dart';
 class MailConnectionProvider with ChangeNotifier { 
 
 
-  final List<enoughMail.ImapClient> clientList;
+  List<ClientItem> clientList = [];
   List<EmailItemModel> emailList;
 
   MailConnectionProvider( {
@@ -106,7 +107,7 @@ class MailConnectionProvider with ChangeNotifier {
     if( clientList.length > 0) {
 
       for(  int i = 0; i < clientList.length; i++) {
-        await getHeaders( clientList[i] );
+        await getHeaders( clientList[i].imapClient );
       }
 
     }
@@ -115,19 +116,7 @@ class MailConnectionProvider with ChangeNotifier {
 
   }
 
-  Future<void> getAllHeadersOnMainDart() async {
-    print( 'getAllHeaders Method is Beginning' );
-    if( clientList.length > 0) {
-      clientList.forEach( (clientItem) async {
-        await getHeaders(clientItem);
-      } );
-    }
-    notifyListeners();
-    print( 'getAllHeaders Method has Ended' );
-    counter++;
-    print('hetAllHeaders  ------------$counter--------------------------------------------------------------------------------------------------');
 
-  }
 
 
 
@@ -167,12 +156,17 @@ class MailConnectionProvider with ChangeNotifier {
       //   'port' : newAccount.incomingMailsPort
       // });
 
+
+
       // Prepare Format of Account to Add
       final accountToAdd =  { 
+        'senderName' : newAccount.senderName,
         'email' : newAccount.emailAddress,
         'password' : newAccount.emailPassword,
         'incomingServer': newAccount.incomingMailsServer,
-        'port' : newAccount.incomingMailsPort
+        'incomingPort' : newAccount.incomingMailsPort,
+        'outgoingServer' : newAccount.outgoingMailsServer,
+        'outgoingPort' : newAccount.outgoingMailsPort
       };
 
       // Save Account on Device
@@ -189,7 +183,12 @@ class MailConnectionProvider with ChangeNotifier {
       );
 
       _accountCount++;
-      clientList.add(client);
+
+      
+      clientList.add( ClientItem(
+        emailAccount: newAccount,
+        imapClient: client
+      ) );
       notifyListeners();
 
       print('Account Below has been Added');
@@ -474,38 +473,7 @@ testVar3.result.toString()
       print( 'Date and Delivery-date not found!' );
       return 'No-Date';
     }
-  }
-
-
-
-
-  Future<enoughMail.ImapClient> connectClientToServer (
-    EmailAccount accountToConnect
-  ) async {
-    var client  = enoughMail.ImapClient(isLogEnabled: true);
-    // await client.connectToServer(incomingServer1, portNo1, isSecure: true);
-    // var loginResponse = await client.login(mailAddress1, mailPassword1);
-    // var client  = enoughMail.ImapClient(isLogEnabled: true);
-    await client.connectToServer(
-      accountToConnect.incomingMailsServer, 
-      int.parse(accountToConnect.incomingMailsPort), 
-      isSecure: true
-    );
-    var loginResponse = await client.login(
-      accountToConnect.emailAddress, 
-      accountToConnect.emailPassword
-    );
-    if (  !loginResponse.isOkStatus ) {
-      print('Auth Error');
-      return null;
-    } else {
-      clientList.add(client);
-      notifyListeners();
-      print('Client ${accountToConnect.emailAddress} has been added to clientList');
-      return client;
-    }
-  }
-  
+  } 
 
 
   Future<void> getHeaders (

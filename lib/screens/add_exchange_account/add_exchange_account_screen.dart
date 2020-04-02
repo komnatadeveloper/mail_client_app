@@ -22,20 +22,26 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
     'emailAddress': '',
     'emailPassword': '',
     'incomingMailsServer': '',
-    'incomingMailsPort': ''
+    'incomingMailsPort': '',
+    'outgoingMailsServer': '',
+    'outgoingMailsPort': ''
   };
 
   var _editedEmailAccount = EmailAccount(
     emailAddress: '',
     emailPassword: '',
     incomingMailsServer: '',
-    incomingMailsPort: ''
+    incomingMailsPort: '',
+    outgoingMailsServer: '',
+    outgoingMailsPort: '',
   );
 
   final _emailAddress = FocusNode();
   final _emailPassword = FocusNode();
   final _incomingMailsServer = FocusNode();
   final _incomingMailsPort = FocusNode();
+  final _outgoingMailsServer = FocusNode();
+  final _outgoingMailsPort = FocusNode();
 
   final _formGlobalKey = GlobalKey<FormState>();
 
@@ -66,6 +72,8 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
     _emailPassword.dispose();
     _incomingMailsServer.dispose();
     _incomingMailsPort.dispose();
+    _outgoingMailsServer.dispose();
+    _outgoingMailsPort.dispose();
     super.dispose();
   }
 
@@ -126,7 +134,9 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                               emailAddress: value,
                               emailPassword: _editedEmailAccount.emailPassword,
                               incomingMailsServer: _editedEmailAccount.incomingMailsServer,
-                              incomingMailsPort: _editedEmailAccount.incomingMailsPort
+                              incomingMailsPort: _editedEmailAccount.incomingMailsPort,
+                              outgoingMailsServer: _editedEmailAccount.outgoingMailsServer,
+                              outgoingMailsPort: _editedEmailAccount.outgoingMailsPort,
                             );
                           },
 
@@ -153,7 +163,9 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                               emailAddress: _editedEmailAccount.emailAddress,
                               emailPassword: value,
                               incomingMailsServer: _editedEmailAccount.incomingMailsServer,
-                              incomingMailsPort: _editedEmailAccount.incomingMailsPort
+                              incomingMailsPort: _editedEmailAccount.incomingMailsPort,
+                              outgoingMailsServer: _editedEmailAccount.outgoingMailsServer,
+                              outgoingMailsPort: _editedEmailAccount.outgoingMailsPort,
                             );
                           },
                           
@@ -187,7 +199,9 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                               emailAddress: _editedEmailAccount.emailAddress,
                               emailPassword: _editedEmailAccount.emailPassword,
                               incomingMailsServer: value,
-                              incomingMailsPort: _editedEmailAccount.incomingMailsPort
+                              incomingMailsPort: _editedEmailAccount.incomingMailsPort,
+                              outgoingMailsServer: _editedEmailAccount.outgoingMailsServer,
+                              outgoingMailsPort: _editedEmailAccount.outgoingMailsPort,
                             );
                           },
                           
@@ -214,7 +228,66 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                               emailAddress: _editedEmailAccount.emailAddress,
                               emailPassword: _editedEmailAccount.emailPassword,
                               incomingMailsServer: _editedEmailAccount.incomingMailsServer,
-                              incomingMailsPort: value
+                              incomingMailsPort: value,
+                              outgoingMailsServer: _editedEmailAccount.outgoingMailsServer,
+                              outgoingMailsPort: _editedEmailAccount.outgoingMailsPort,
+                            );
+                          },
+                          
+                        ),
+
+                        // Outgoing Mails Server
+                        TextFormField(
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            labelText: 'Outgoing Mails Server',
+                            labelStyle: TextStyle(
+                              color: Colors.grey
+                            ),
+                            focusedBorder: InputBorder.none,
+                            border: InputBorder.none
+                            
+                          ),
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.title.color
+                          ),
+                          onSaved: ( value ) {
+                            _editedEmailAccount = EmailAccount(
+                              emailAddress: _editedEmailAccount.emailAddress,
+                              emailPassword: _editedEmailAccount.emailPassword,
+                              incomingMailsServer: _editedEmailAccount.incomingMailsServer,
+                              incomingMailsPort: _editedEmailAccount.incomingMailsPort,
+                              outgoingMailsServer: value,
+                              outgoingMailsPort: _editedEmailAccount.outgoingMailsPort,
+                            );
+                          },
+                          
+                          
+                        ),
+
+                        // Outgoing Mails Port
+                        TextFormField(
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            labelText: 'Outgoing Mails Port',
+                            labelStyle: TextStyle(
+                              color: Colors.grey
+                            ),
+                            focusedBorder: InputBorder.none,
+                            border: InputBorder.none
+                            
+                          ),
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.title.color
+                          ),
+                          onSaved: ( value ) {
+                            _editedEmailAccount = EmailAccount(
+                              emailAddress: _editedEmailAccount.emailAddress,
+                              emailPassword: _editedEmailAccount.emailPassword,
+                              incomingMailsServer: _editedEmailAccount.incomingMailsServer,
+                              incomingMailsPort: _editedEmailAccount.incomingMailsPort,
+                              outgoingMailsServer: _editedEmailAccount.outgoingMailsServer,
+                              outgoingMailsPort: value,
                             );
                           },
                           
