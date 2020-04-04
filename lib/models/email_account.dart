@@ -10,6 +10,8 @@ class EmailAccount {
   String outgoingMailsServer;
   String outgoingMailsPort;
 
+  DateTime lastConnectionTime;
+
 
 
   // String emailAddress;

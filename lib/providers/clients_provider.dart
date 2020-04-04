@@ -24,7 +24,7 @@ class ClientsProvider with ChangeNotifier {
   bool _isInitialised = false;
   bool _isInitialising = true;
   List<EmailAccount> _emailAccountList = [];
-  List<ClientItem> clientList = [];
+  List<ClientItem> _clientList = [];
   var _isImapClientLogin = false;
   int _accountCount;
   String _preferredMail;
@@ -36,6 +36,10 @@ class ClientsProvider with ChangeNotifier {
   }
   List<EmailAccount> get emailAccountList {
     return _emailAccountList;
+  }
+
+  List<ClientItem> get clientList {
+    return _clientList;
   }
   bool get isImapClientLogin {
     return _isImapClientLogin;
@@ -139,7 +143,7 @@ class ClientsProvider with ChangeNotifier {
               outgoingMailsPort: accountItem['outgoingPort'],
           );
           clientItem.emailAccount = newAccount;      
-          clientList.add( clientItem );
+          _clientList.add( clientItem );
         });
       }
       _preferredMail = extractedUserData['preferredMail'];
@@ -203,9 +207,9 @@ class ClientsProvider with ChangeNotifier {
 
   Future<void> connectAndAddAllAccounts1() async {
     print('connectAllAccounts method RUNNING');
-    if( clientList.length > 0 )  {
-      for( int i = 0; i < clientList.length; i++ ) {
-        var account = clientList[i].emailAccount;
+    if( _clientList.length > 0 )  {
+      for( int i = 0; i < _clientList.length; i++ ) {
+        var account = _clientList[i].emailAccount;
         var client  = enoughMail.ImapClient(isLogEnabled: true);
 
         await client.connectToServer(
@@ -226,7 +230,8 @@ class ClientsProvider with ChangeNotifier {
           // var listResponse = await client.listMailboxes();
           // // Select MailBox
           // await client.selectMailbox( listResponse.result[0]);
-          clientList[i].imapClient = client;
+          _clientList[i].imapClient = client;
+          _clientList[i].emailAccount.lastConnectionTime = DateTime.now();
           print('Client ${account.emailAddress} has been added to clientList'); 
         } // end of else
       } // End of For Loop

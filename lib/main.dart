@@ -29,11 +29,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<ClientsProvider, MailConnectionProvider>(
           create: ( ctx ) => MailConnectionProvider( 
             clientList: [],
-            emailList: []  
+            emailList: [],
+            reconnectAccounts: null  
           ),
           update: ( _, clientsProvider, previosMailConnectionProvider ) => MailConnectionProvider(
             clientList: clientsProvider.clientList,
-            emailList: previosMailConnectionProvider.emailList
+            emailList: previosMailConnectionProvider.emailList,
+            reconnectAccounts: clientsProvider.connectAndAddAllAccounts1
           )
 
         )

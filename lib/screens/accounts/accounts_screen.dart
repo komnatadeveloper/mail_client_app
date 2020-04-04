@@ -118,10 +118,7 @@ class AccountsScreen extends StatelessWidget {
               
               
             ),
-            Text(
-              Provider.of<MailConnectionProvider>(context).toBePrinted,
-              style: TextStyle(color: Colors.white),
-            )
+
           ],
         ),
       ),

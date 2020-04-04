@@ -112,6 +112,9 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
 
   @override
   void didChangeDependencies() {
+
+    print('INCOMING MAILS SCREEN WIDGET I didUpdateDependencies ICI');
+    print( 'isInited: $_isInited  isInitialising: ${Provider.of<ClientsProvider>(context).isInitialising}');
     
     if(!_isInited && !Provider.of<ClientsProvider>(context).isInitialising  ) {
       print('Get All Headers Call Inside Incoming Mails Screen');
@@ -158,7 +161,15 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
 
                 Switch(
                   value: false, 
-                  onChanged: (val) {}
+                  onChanged: (val) {
+                    print('INCOMING MAILS SCREEN SWITCH');
+                    final clientsProvider = Provider.of<ClientsProvider>(context);
+                    print(clientsProvider.isInitialising);
+                    print(clientsProvider.clientList.length);
+                    print(clientsProvider.clientList[0].emailAccount);
+                    print(clientsProvider.clientList[0].emailAccount.lastConnectionTime);
+                    // print(clientsProvider.isInitialising);
+                  }
                 )
 
               ],
