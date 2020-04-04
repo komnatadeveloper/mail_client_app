@@ -116,17 +116,44 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
     print('INCOMING MAILS SCREEN WIDGET I didUpdateDependencies ICI');
     print( 'isInited: $_isInited  isInitialising: ${Provider.of<ClientsProvider>(context).isInitialising}');
     
-    if(!_isInited && !Provider.of<ClientsProvider>(context).isInitialising  ) {
+    // IncomingMailsScreen not Inited & Clients Provider ALREADY INITIALISED (not isInitialising)
+    if( !_isInited 
+      && !Provider.of<ClientsProvider>(context).isInitialising 
+      && !Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised  
+      ) {
       print('Get All Headers Call Inside Incoming Mails Screen');
       Provider.of<MailConnectionProvider>(context, listen: false).getAllHeaders()
         .then( (_) {
           setState(() {
             _isInited = true;
+            Provider.of<MailConnectionProvider>(context, listen: false).makeIncomingMailsScreenInitialised();
+          });          
+      });        
+    } // end of if
+
+    if( 
+      !_isInited 
+      && !Provider.of<ClientsProvider>(context).isInitialising 
+      && Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised 
+     ) {
+       print('This is our Area... Do Smt FAST');
+       Provider.of<MailConnectionProvider>(context,listen: false).checkandAddNewHeaders()
+        .then( ( _ ) {
+          setState(() {
+            _isInited = true;
           });
-        });        
-    }
+        });
+     }
+
+
+
+
+
+
+
+
     super.didChangeDependencies();
-  }
+  }  // end of didChangeDependencies
   
 
   @override
@@ -192,13 +219,19 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
             
           children: <Widget>[
 
-            _isInited 
-              ? IncomingMails( varAppBar.preferredSize ) 
-              : Expanded(
+            ( 
+              !_isInited 
+              && !Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised 
+            )
+              ? Expanded(
                 child: Center(
                   child: CircularProgressIndicator(),
                 ),
               )
+              : IncomingMails( 
+                varAppBar.preferredSize ,
+                _isInited
+              ) 
               
 
           ],

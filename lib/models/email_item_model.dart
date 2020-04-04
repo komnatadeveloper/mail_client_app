@@ -4,7 +4,7 @@
 class  EmailHeader {
   String from;
   String subject;
-  String date; 
+  DateTime date; 
   List<String> recipients;  // list of people, when sending email
 
   EmailHeader( {

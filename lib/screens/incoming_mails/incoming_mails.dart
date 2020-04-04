@@ -10,9 +10,13 @@ import './mail_item.dart';
 
 class IncomingMails  extends StatelessWidget {
 
-  // final List<IncomingMailItem> incomingMailsList;
+  bool _isIncomingMailsScreenInitialised;
   final Size appBarPreferredHeight;
-  IncomingMails( this.appBarPreferredHeight );
+
+  IncomingMails( 
+    this.appBarPreferredHeight, 
+    this._isIncomingMailsScreenInitialised
+  );
 
 
 
@@ -29,39 +33,53 @@ class IncomingMails  extends StatelessWidget {
             - MediaQuery.of(context).padding.top - 24 
           ),
 
-          child: Consumer<MailConnectionProvider>(
-            builder: ( ctx, mailConnectionProvider, child ) => mailConnectionProvider.headersList.length == 0
-              ? Center(
-                child: Text(
-                  'No Mails',
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.title.color
-                  ),
+          child: Column(
+            children: <Widget>[
+              !_isIncomingMailsScreenInitialised 
+                ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[CircularProgressIndicator()],
+                ) 
+                : Container(),
+              Expanded(
+                child: Consumer<MailConnectionProvider>(
+                  builder: ( ctx, mailConnectionProvider, child ) => mailConnectionProvider.headersList.length == 0
+                    ? Center(
+                      child: Text(
+                        'No Mails',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.title.color
+                        ),
+                      ),
+                    )
+                    : ListView.builder(
+                      itemBuilder: ( ctx, index ) {
+
+                        return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.only(
+                            bottom: 0,
+                            top: 0,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1.0, color: Colors.white)
+                          ),
+
+
+                          child: MailItem( mailConnectionProvider.headersList[index] ),
+                            
+
+                        );
+                      },
+                      itemCount: mailConnectionProvider.headersList.length,
+                    )
+                    
                 ),
               )
-              : ListView.builder(
-                itemBuilder: ( ctx, index ) {
-
-                  return Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.only(
-                      bottom: 0,
-                      top: 0,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1.0, color: Colors.white)
-                    ),
-
-
-                    child: MailItem( mailConnectionProvider.headersList[index] ),
-                      
-
-                  );
-                },
-                itemCount: mailConnectionProvider.headersList.length,
-              )
-              
+            ],
           )
+          
+           
         );
       }
     );

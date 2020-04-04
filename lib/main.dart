@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mail_client_app/models/mail_connection_provider_status.dart';
 import 'package:provider/provider.dart';
 
 import './providers/mail_connection_provider.dart';
@@ -28,11 +29,13 @@ class MyApp extends StatelessWidget {
 
         ChangeNotifierProxyProvider<ClientsProvider, MailConnectionProvider>(
           create: ( ctx ) => MailConnectionProvider( 
+            mailConnectionProviderStatus: MailConnectionProviderStatus(),
             clientList: [],
             emailList: [],
             reconnectAccounts: null  
           ),
           update: ( _, clientsProvider, previosMailConnectionProvider ) => MailConnectionProvider(
+            mailConnectionProviderStatus: previosMailConnectionProvider.mailConnectionProviderStatus,
             clientList: clientsProvider.clientList,
             emailList: previosMailConnectionProvider.emailList,
             reconnectAccounts: clientsProvider.connectAndAddAllAccounts1
