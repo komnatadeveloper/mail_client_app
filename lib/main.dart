@@ -63,7 +63,7 @@ class VarMaterialApp extends StatefulWidget {
 // STATE
 class _VarMaterialAppState extends State<VarMaterialApp> {
 
-  var _isInited = false;
+  // var _isInited = false;
 
   @override
   void initState() {
@@ -73,7 +73,7 @@ class _VarMaterialAppState extends State<VarMaterialApp> {
     ).initialiseApp()
       .then( ( _ )  {
         setState((){
-          _isInited = true;
+          // _isInited = true;
         });
       });
     super.initState();

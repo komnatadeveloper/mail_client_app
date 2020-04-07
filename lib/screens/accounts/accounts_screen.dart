@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../providers/mail_connection_provider.dart';
 
 import '../settings/settings_screen.dart';
 import '../add_exchange_account/add_exchange_account_screen.dart';
+
+
 
 class AccountsScreen extends StatelessWidget {
   static const routeName = '/accounts';

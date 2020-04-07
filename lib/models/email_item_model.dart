@@ -6,11 +6,19 @@ class  EmailHeader {
   String subject;
   DateTime date; 
   List<String> recipients;  // list of people, when sending email
+  int emailId;
 
   EmailHeader( {
     this.from,
     this.subject,
     this.date
+  });
+
+  EmailHeader.withId( {
+    this.from,
+    this.subject,
+    this.date,
+    this.emailId
   });
 
 

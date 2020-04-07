@@ -18,14 +18,14 @@ class AddExchangeAccountScreen extends StatefulWidget {
 class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
 
 
-  var _initValues = {
-    'emailAddress': '',
-    'emailPassword': '',
-    'incomingMailsServer': '',
-    'incomingMailsPort': '',
-    'outgoingMailsServer': '',
-    'outgoingMailsPort': ''
-  };
+  // var _initValues = {
+  //   'emailAddress': '',
+  //   'emailPassword': '',
+  //   'incomingMailsServer': '',
+  //   'incomingMailsPort': '',
+  //   'outgoingMailsServer': '',
+  //   'outgoingMailsPort': ''
+  // };
 
   var _editedEmailAccount = EmailAccount(
     emailAddress: '',
@@ -61,12 +61,6 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
 
   }  // end of _saveForm
 
-  // @override
-  // void didChangeDependencies() {
-  //   _it
-    
-  //   super.didChangeDependencies();
-  // }  // End of didChangeDependencies
 
   @override
   void dispose() {

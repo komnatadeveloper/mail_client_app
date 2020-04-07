@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:intl/intl.dart' as intl;
-// import 'package:jiffy/jiffy.dart' as jiffyPackage;
 import 'dart:convert' as convert;
 import 'package:enough_mail/enough_mail.dart' as enoughMail;
 
-// For http requests http.dart & convert for json.decode & json.encode
-// import 'package:http/http.dart' as http;
 
-
-
-// import 'package:imap_client/imap_client.dart' as imapClient;
-
-import "../environment/vars.dart";
-// import 'package:mail_client_app/environment/vars.dart';
 import '../models/email_account.dart';
 import '../models/client_item_model.dart';
 
@@ -75,7 +65,7 @@ class ClientsProvider with ChangeNotifier {
     getInitDataFromDb()
     .then(( _ ) {
       connectAndAddAllAccounts1()
-        .then( ( _2 ) {
+        .then( ( _x2 ) {
           _isInitialising = false;
           print('Client List Length: ${clientList.length}');
           print('_isInitialising is set to FALSE');
@@ -88,11 +78,9 @@ class ClientsProvider with ChangeNotifier {
   // Get Initial Data From Device
   Future<void> getInitDataFromDb ()  async{
     final prefs = await SharedPreferences.getInstance();
-    print('GET INIT DATA FROM DB');
 
     // If First Use of App
-    if(  !prefs.containsKey( 'komnataMailClient' ) ) {    
-      print('FIRST USE OF APP');  
+    if(  !prefs.containsKey( 'komnataMailClient' ) ) {
 
       final logToAdd = convert.json.encode( { 
         'accountList': [],
@@ -106,24 +94,16 @@ class ClientsProvider with ChangeNotifier {
       _preferredView = 'all';
 
 
-    } else {
-      print('NOT FIRST USE OF APP');  
+    } else {  // NOT FIRST USE OF APP 
       final extractedUserData = convert.json.decode(
         prefs.getString('komnataMailClient')
       ) as Map<String, Object>;
 
-      print('LETS PRINT EXTRACTED USER DATA komnataMailClient from Shared Prefs');
-      print(extractedUserData);
-
       // await prefs.remove('komnataMailClient');
       // return;
 
-      // final tempAccountList = extractedUserData['accountList'] as List<Map<String, Object>>;
-
       final tempAccountList = extractedUserData['accountList'] as List;
-
-      print('getInitDataFromDb ${tempAccountList.length} Accounts Exists');
-
+      // print('getInitDataFromDb ${tempAccountList.length} Accounts Exists');
 
       _accountCount = tempAccountList.length;
       if( _accountCount > 0 ) {
@@ -151,58 +131,9 @@ class ClientsProvider with ChangeNotifier {
 
     }
     // notifyListeners();
-    print('End of getInitDataFromDb');
+    // print('End of getInitDataFromDb');
   }  // End of getInitDataFromDb
 
-
-
-  Future<void> connectAndAddAllAccounts() async {
-    print('connectAllAccounts method RUNNING');
-    if( _accountCount > 0 )  {
-      clientList.forEach( (clientItem) async {
-
-
-        var client  = enoughMail.ImapClient(isLogEnabled: true);
-
-        client.connectToServer(
-          clientItem.emailAccount.incomingMailsServer, 
-          int.parse(clientItem.emailAccount.incomingMailsPort), 
-          isSecure: true
-        )
-          .then( ( _ ) {
-
-            client.login(
-              clientItem.emailAccount.emailAddress, 
-              clientItem.emailAccount.emailPassword
-            ).then( (loginResponse) {
-              if (  !loginResponse.isOkStatus ) {
-                print('Auth Error of ${clientItem.emailAccount.emailAddress}');
-              } else {
-
-                client.listMailboxes()
-                  .then((listResponse) {
-                    // Select MailBox
-                    client.selectMailbox( listResponse.result[0])
-                      .then( (_3) {
-                        // Add to Client List
-                        clientItem.imapClient = client;
-                        // clientList.add(client);
-                        // notifyListeners();
-                        print('Client ${clientItem.emailAccount.emailAddress} has been added to clientList');       
-
-                      });  // After selectMailBox
-                  });  // After ListMailBoxes   
-              }  // end of else 
-
-            }); // After login
-          }); // After connectToServer
-
-      });  // emailAccountList for Each
-        
-    }  // Enf of if _accountCount > 0
-    print('connectAllAccounts method has finished');
-    // notifyListeners();
-  }
 
 
   Future<void> connectAndAddAllAccounts1() async {
@@ -242,34 +173,6 @@ class ClientsProvider with ChangeNotifier {
     // notifyListeners();
   }
 
+  
 
-  // Future<enoughMail.ImapClient> connectClientToServer (
-  //   EmailAccount accountToConnect
-  // ) async {
-  //   var client  = enoughMail.ImapClient(isLogEnabled: true);
-  //   // await client.connectToServer(incomingServer1, portNo1, isSecure: true);
-  //   // var loginResponse = await client.login(mailAddress1, mailPassword1);
-  //   // var client  = enoughMail.ImapClient(isLogEnabled: true);
-  //   var portInt = int.parse(accountToConnect.incomingMailsPort);
-  //   var socket  = await client.connectToServer(
-  //     accountToConnect.incomingMailsServer, 
-  //     portInt, 
-  //     isSecure: true
-  //   );
-  //   print(client.toString());
-  //   var loginResponse = await client.login(
-  //     accountToConnect.emailAddress, 
-  //     accountToConnect.emailPassword
-  //   );
-  //   if (  !loginResponse.isOkStatus ) {
-  //     print('Auth Error');
-  //     return null;
-  //   } else {
-  //     clientList.add(client);
-  //     notifyListeners();
-  //     print('Client ${accountToConnect.emailAddress} has been added to clientList');
-  //     return client;
-  //   }
-  // }
-
-}
+}  // End of ClientsProvider

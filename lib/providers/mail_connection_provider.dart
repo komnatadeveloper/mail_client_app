@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart' as intl;
 import 'package:jiffy/jiffy.dart' as jiffyPackage;
 import 'package:enough_mail/enough_mail.dart' as enoughMail;
-import 'package:flutter_email_sender/flutter_email_sender.dart' as emailSender;
 import 'package:mailer2/mailer.dart' as mailer2;
 
 // For http requests http.dart & convert for json.decode & json.encode
@@ -48,7 +46,7 @@ class MailConnectionProvider with ChangeNotifier {
   int _accountCount;
   String _preferredMail;
   String _preferredView;
-  dynamic _headersList = [];   // dynamic to be changed in future
+  // dynamic _headersList = [];   // dynamic to be changed in future
   bool _isLoadingIncoming = false;
 
   bool get isInitialising {
@@ -67,20 +65,27 @@ class MailConnectionProvider with ChangeNotifier {
     return _preferredView;
   }
 
-  List<Map<String, Object>> get headersList {
+  List<EmailHeader> get headersList {
     // var tempList = _headersList as List<Map<String, Object>>;
-    List<Map<String, Object>> returnList = [];
+    List<EmailHeader> returnList = [];
 
     // Transform Date String
     emailList.forEach( (emailItem) {
       // var dateString = emailItem.header.date;
       // var jiffy = jiffyPackage.Jiffy(dateString, 'EEE, dd MMM yyyy hh:mm:ss');
 
-      returnList.add({
-        'Date': intl.DateFormat('yyyy/MM/dd').format( emailItem.header.date ),
-        'Subject': emailItem.header.subject,
-        'From': emailItem.header.from,
-      });
+      // returnList.add({
+      //   'Date': intl.DateFormat('yyyy/MM/dd').format( emailItem.header.date ),
+      //   'Subject': emailItem.header.subject,
+      //   'From': emailItem.header.from,
+      // });
+
+      returnList.add(  emailItem.header );
+
+
+
+      
+
 
     } );
     return returnList;
@@ -100,6 +105,11 @@ class MailConnectionProvider with ChangeNotifier {
     mailConnectionProviderStatus.isIncomingMailsScreenInitialised = true;
     notifyListeners();
   }
+
+
+
+
+
 
 
 
@@ -140,23 +150,21 @@ class MailConnectionProvider with ChangeNotifier {
   }
 
 
-  // bool compareEmailHeaders({
-    
-  // }) {
-
-  // }
-
-
+  // To check Last 50(Max) Headers, and Add or Delete Some Existing Ones if Necessary
   Future<void> checkandAddNewHeaders () async { 
-    print('DECODE ETMEYE CALISALIM YENI TIPI');
-    print('=?iso-8859-9?Q?Ma=FDl_Konu._Tarih_2020.04.05_01?=');
-    enoughMail.EncodingsHelper.decodeAny('=?iso-8859-9?Q?Ma=FDl_Konu._Tarih_2020.04.05_01?=');
+
+    clientList[0].imapClient.searchMessages(
+      // ' SENTON 06-Apr-2020 FROM cpanel@teknodogu.com.tr'
+      // ' FROM cpanel@teknodogu.com.tr'
+      'SUBJECT e maili test ediyorum.. İnan'
+      // 'UID 3405:*'
+    );
+    // enoughMail.EncodingsHelper.decodeAny('Ma=FDl_Konu._Tarih_2020.04.05_01');
     // enoughMail.EncodingsHelper.decodeText('=?iso-8859-9?Q?Ma=FDl_Konu._Tarih_2020.04.05_01?=', convert.);
 
     if( clientList.length > 0) {
       List<int> mailCountsList = [];
       if( isNecessaryToReconnect ) {
-        print('RECONNECTING ACCOUNTS in isNecessaryToReconnect Method-----------------------------------------------------------------------------');
         await reconnectAccounts(); 
         mailCountsList = await selectAllMailboxes();
       }  // End of if ( NecessaryToConnect )
@@ -173,17 +181,8 @@ class MailConnectionProvider with ChangeNotifier {
           tempFetchedEmailsList.addAll(
             thisAccountsList.getRange(0, thisAccountsList.length)  // to convert to iterable
           );
-          print('tempFetchedEmailsList yazilacak...............................................................');
-          print('0 Ci Tarih.... YENI GELENLERINKI');
-          print(tempFetchedEmailsList[0].header.date);
-          print('SON  Tarih.... YENI GELENLERINKI');
-          print(tempFetchedEmailsList[tempFetchedEmailsList.length-1].header.date);
-          print('0 Ci Tarih.... ESKI LISTE');
-          print(emailList[0].header.date);
-          print('SON  Tarih.... ESKI LISTE');
-          print(emailList[emailList.length-1].header.date);
 
-        }
+        } // End of for loop
 
         compareAndAddNewHeaders(tempFetchedEmailsList);
         notifyListeners();
@@ -198,25 +197,53 @@ class MailConnectionProvider with ChangeNotifier {
       return;
     }
     var addedEmailCount = 0;
-    
+    bool checkingNewOnes = true;
+    var deletedCount = 0;
+    var pointerValue = 0;    
 
     for(int i =  newFetchedList.length-1; i >= 0; i--  ) {
       if( 
-        newFetchedList[i].header.date.isAfter(
+        checkingNewOnes == true
+        && newFetchedList[i].header.date.isAfter(
           emailList[ 0 + addedEmailCount ].header.date
         ) 
       ) {
         emailList.insert(0, newFetchedList[i] );
         addedEmailCount++;
       } else {
-        return;
+        checkingNewOnes = false;
+        print('In compareAndAddNewHeaders method, Added total count = $addedEmailCount');
       }
-    }
+
+      if(checkingNewOnes == false) {
+        // addedEmailCount++;  // To use addedEmailCount for pointing existing List Index
+        var controlledIndex = pointerValue + addedEmailCount - deletedCount;
+        if(           
+          newFetchedList[i].header.date != emailList[ controlledIndex ].header.date
+          || newFetchedList[i].header.subject  != emailList[ controlledIndex ].header.subject
+          || newFetchedList[i].header.from  != emailList[ controlledIndex ].header.from
+        ) {
+          emailList.removeAt( controlledIndex  );
+          deletedCount++;
+          i++;  
+        } else {
+          // print(newFetchedList[i].header.date);
+
+          // Update each Email Id if there is any deleted or added one...
+          if(deletedCount > 0 || addedEmailCount > 0 ) {
+            emailList[ controlledIndex ].header.emailId = newFetchedList[i].header.emailId;
+          }
+        }
+        pointerValue++;
+      }  // End of if(checkingNewOnes == false)
+
+    }  // End of for loop over newFetchedList
   }  // End of compareAndAddNewHeaders
   
 
-  String handleFetchedComplexBase64 (String data) {   
-    print('   handleFetchedComplexBase64 Metodu----------------------------------------------------------- giren data: $data');     
+
+  String handleFetchedComplexBase64 (String data) {      
+
 
     if( data.toString().contains('?utf-8?B?')  || data.toString().contains('?UTF-8?B?') ) {
       var datatoHandle = data.toString();
@@ -225,8 +252,7 @@ class MailConnectionProvider with ChangeNotifier {
       var step1 = datatoHandle.replaceAll('=?utf-8?B?', 'STARTER');             
       var step2 = step1.replaceAll('=?UTF-8?B?', 'STARTER'); 
       var step3 = step2.replaceAll('==?=', 'ENDING'); 
-      var step4 = step3.replaceAll('?=', 'ENDING'); 
-            
+      var step4 = step3.replaceAll('?=', 'ENDING');            
 
       List<String> stringArray = [];
       int stringStartIndex;
@@ -248,15 +274,10 @@ class MailConnectionProvider with ChangeNotifier {
       stringArray.forEach( (element) {        
         printableString = printableString + enoughMail.EncodingsHelper.decodeBase64(element, convert.utf8);
       } );  
-
       return printableString;
 
-
-    } else if( data.toString().contains('=?UTF-8?Q?') || data.toString().contains('=?utf-8?Q?')  ) {
-
-      
-      var datatoHandle = data.toString();
-      
+    } else if( data.toString().contains('=?UTF-8?Q?') || data.toString().contains('=?utf-8?Q?')  ) {      
+      var datatoHandle = data.toString();     
 
       // Transform String
       var step1 = datatoHandle.replaceAll('?= =?utf-8?Q?', 'ENDINGSTARTER');
@@ -264,8 +285,7 @@ class MailConnectionProvider with ChangeNotifier {
       step1 =step1.replaceAll('?= =?UTF-8?Q?', 'ENDINGSTARTER');
       step1 = step1.replaceAll('=?UTF-8?Q?', 'STARTER');
       step1 = step1.replaceAll('==?=', 'ENDING'); 
-      step1 = step1.replaceAll('?=', 'ENDING'); 
-            
+      step1 = step1.replaceAll('?=', 'ENDING');             
 
       List<String> stringArray = [];
       int stringStartIndex;
@@ -280,9 +300,7 @@ class MailConnectionProvider with ChangeNotifier {
         // If there is some "not encoded" text at the beginning
         if(stringStartIndex >= 0) {
           stringArray.add( step1.substring(0, stringStartIndex)  );
-        }
-
-        
+        }        
 
         addString = enoughMail.EncodingsHelper.decodeQuotedPrintable(
           step1.substring( stringStartIndex+7, stringEndIndex ),
@@ -302,14 +320,11 @@ class MailConnectionProvider with ChangeNotifier {
       stringArray.forEach( (element) {        
         printableString = printableString + element;
       } );  
-      print(printableString);
       return printableString;
 
-    } else {
-      print('Direk Girdigi gibi cikiyor: $data');
-      return data;
+    } else {      
+      return data; // Return without any manipulation
     }
-
   } // End of handleFetchedComplexBase64
 
 
@@ -334,30 +349,26 @@ class MailConnectionProvider with ChangeNotifier {
     int firstIndex,
     int lastIndex
    ) async {
-    List<EmailItemModel> fetchedEmailHeaderList =[];
 
-    print('Ilk index $firstIndex son index ise $lastIndex -------------------------------------------------------');
+    List<EmailItemModel> fetchedEmailHeaderList =[];
 
     // var dates = await client.fetchMessages(1, 10, "BODY.PEEK[HEADER]");
     var rawResponse = await client.fetchMessages(
       firstIndex, 
       lastIndex, 
       // 1,31,
-      // "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
+      "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
       // "BODY.PEEK[HEADER]"
       // 'BODY.PEEK[HEADER.FIELDS (Received)]'
       // 'BODY.PEEK[HEADER.FIELDS (Message-ID)]'  // Message-ID BU SEKILDE
       // 'BODY.PEEK[HEADER.FIELDS (Message-ID Received)]'
-      'BODY[]'
+      // 'BODY[]'
+      // '( BODY[] UID )'
+      // 'BODY[TEXT]'
     );
     var mappedData = rawResponse.result;
 
-    // print('RAW RESPONSE CEVABI-----------------------------------------------------------');
-    // print(mappedData);
-
-    // print(mappedData);
-    print('---------------------------------------------MANIPULATE FETCHED DATAS in fetchHeaderFields Method---------------------------------');
-
+    var currentIndex = firstIndex;
     mappedData.forEach( (mimeItem) {
       String contentType;
       String from;
@@ -384,20 +395,20 @@ class MailConnectionProvider with ChangeNotifier {
             break;
           
           default:
-            print( 'INTERESTING HEADER: ' +headersItem.name + ':' + headersItem.value );
+            // print( 'INTERESTING HEADER: ' +headersItem.name + ':' + headersItem.value );
         }
       });      
 
       // Create Email Header From Sorted Headers
-      var emailHeader = EmailHeader(
+      var emailHeader = EmailHeader.withId(
         subject: handleFetchedComplexBase64(subject),
         from: from,
         date: handleSelectDate( 
           date: date,
           deliveryDate: deliveryDate
         ),
+        emailId: currentIndex
       );
-      print(emailHeader.subject);  // FOR TEST
 
       // Add Each Header To Our Temporary List
       fetchedEmailHeaderList.add( 
@@ -405,6 +416,7 @@ class MailConnectionProvider with ChangeNotifier {
           header: emailHeader
         ) 
       );
+      currentIndex++;
 
     }); // End of Iterating over each Mime
 
@@ -415,85 +427,63 @@ class MailConnectionProvider with ChangeNotifier {
 
   Future<void> getHeaders (
      enoughMail.ImapClient client
-    ) async {
-
-    print('getHeaders METHODU BASLANGICI------------------------------------------');
-    
+    ) async {    
 
     // List Mailboxes
-
     var listResponse;
     try {
 
       listResponse = await client.listMailboxes();
-      print('LISTENIN UZUNLUGU YAZDIRILACAK----------------------');
-      print( listResponse.result.length);
+      // print( listResponse.result.length); // How many Mailboxes do we have?
     } catch (err) {
-      print("HATA BURADA TRY CATCH ICI");
       print(err);
     }
     
     if (listResponse.isOkStatus) {
-      print('listResponse OKEY IMIS. BAKALIM PROBLEM NEREDEEEE');
 
       // Select MailBox
       await client.selectMailbox( listResponse.result[0]);
 
-      print('MAILBOXU DA SECTIK... AMA PROBLEM BITEBILDI MI EMIN DEGILIZ');
-
       // Mail Count
       final mailCount = listResponse.result[0].messagesExists;
-
-      print('Simdi fetchHeaderFields Methodu CAGIRILACAK BAKALIM SONRASI NEEEEEE');
+      
       final tempEmailsList = await fetchHeaderFields( 
         client, 
         1,  
         mailCount <= 50 ? mailCount : 50
       );
-      print('ThIS IS FETCHED HEADER FIELDS OF THIS CLIENT');
-      print(tempEmailsList);
-
+      // print('ThIS IS FETCHED HEADER FIELDS OF THIS CLIENT');
+      // print(tempEmailsList);
 
       emailList.addAll( tempEmailsList.reversed );
 
       // notifyListeners();   
     } else {
-      print('getHeaders Methodu listResponse HATA VERIYOR PROBLEM BURADAAAAAAA---------------------------');
-    }
-    
+      // Do smt
+    }    
   } // end of getHeaders
 
 
 
-
   Future<void> getAllHeaders() async {
-    print( 'getAllHeaders Method is Beginning' );
-    print("Client has ${clientList.length} items");
+    // print( 'getAllHeaders Method is Beginning-------------------------------------------------------' );
+    // print("Client has ${clientList.length} items");
     if( clientList.length > 0) {
 
+      // This is because sometimes after some time, occurs some errors, and auto- reconnect has solved these
       if( isNecessaryToReconnect ) {
-        print('RECONNECTING ACCOUNTS in getAllHeaders Method-----------------------------------------------------------------------------');
         await reconnectAccounts();
       }
 
       for(  int i = 0; i < clientList.length; i++) {
-        print('getHeaders of ${clientList[i].emailAccount.emailAddress} will start  NOWWWWW');
         await getHeaders( clientList[i].imapClient );
       }
 
     }
     notifyListeners();
-    print( 'getAllHeaders Method has Ended' );
+  }  // End of getAllHeaders
 
-  }
-
-
-
-
-
-
-  
-
+ 
 
   // Add Account
   Future<void> addAccount ( EmailAccount newAccount) async {
@@ -508,18 +498,6 @@ class MailConnectionProvider with ChangeNotifier {
     var loginResponse = await client.login( newAccount.emailAddress, newAccount.emailPassword );
 
     if (loginResponse.isOkStatus) {
-
-      // Save Account Info to Device
-
-
-      // final accountToAdd = convert.json.encode( { 
-      //   'email' : newAccount.emailAddress,
-      //   'password' : newAccount.emailPassword,
-      //   'incomingServer': newAccount.incomingMailsServer,
-      //   'port' : newAccount.incomingMailsPort
-      // });
-
-
 
       // Prepare Format of Account to Add
       final accountToAdd =  { 
@@ -546,7 +524,6 @@ class MailConnectionProvider with ChangeNotifier {
       );
 
       _accountCount++;
-
       
       clientList.add( ClientItem(
         emailAccount: newAccount,
@@ -560,59 +537,9 @@ class MailConnectionProvider with ChangeNotifier {
   }   // End of addAccount
 
 
-
-
-
-
-
-  
   
 
-  
-
-
-
-
-
-
-  
-
-
-
-  Future<List<String>> fetchSubjects ( 
-
-    enoughMail.ImapClient client,
-    int firstIndex,
-    int lastIndex
-   ) async {
-    List<String> subjectList =[];
-     
-    var subject = await client.fetchMessages(1, 10, "BODY.PEEK[HEADER.FIELDS (SUBJECT)]");
-    var mappedData = subject.result;
-    // Mapping Fetched "SUBJECT" Data
-    mappedData.forEach( (item) {
-      subjectList.add(
-        handleFetchedComplexBase64(item.headers[0].value)
-      );
-    } );
-
-    print(subjectList);
-    return subjectList;
-  }  // End of fetchSubjects
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-  // It will stay as an example
+  // This method is not used but will stay as an example...
   Future<void> sendMailByMailer2 (  ) async {
 
     var options = new mailer2.SmtpOptions();
@@ -647,8 +574,8 @@ class MailConnectionProvider with ChangeNotifier {
       .catchError((e) => print('Error occurred: $e'));
   }  // End of sendMailByMailer2
 
-
   
+
   Future<void> sendMail ( EmailItemModel  emailItem ) async {
     // It will be used when it is possible to select sender Account
     // var senderClient = clientList.firstWhere( 
@@ -679,7 +606,6 @@ class MailConnectionProvider with ChangeNotifier {
     envelope.subject = emailItem.header.subject;
     envelope.text = emailItem.text;
 
-    print('NOW ITT IS TIME TO SEND EMAIL');
     // Email it.
     emailTransport.send(envelope)
       .then((envelope) { 

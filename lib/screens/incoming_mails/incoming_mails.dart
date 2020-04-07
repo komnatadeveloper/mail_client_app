@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/mail_connection_provider.dart';
-
-import '../../models/incoming_mail_Item.dart';
 import './mail_item.dart';
 
 
 
 class IncomingMails  extends StatelessWidget {
 
-  bool _isIncomingMailsScreenInitialised;
+  final bool _isIncomingMailsScreenInitialised;
   final Size appBarPreferredHeight;
 
   IncomingMails( 
@@ -54,22 +52,7 @@ class IncomingMails  extends StatelessWidget {
                     )
                     : ListView.builder(
                       itemBuilder: ( ctx, index ) {
-
-                        return Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(
-                            bottom: 0,
-                            top: 0,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 1.0, color: Colors.white)
-                          ),
-
-
-                          child: MailItem( mailConnectionProvider.headersList[index] ),
-                            
-
-                        );
+                        return MailItem( mailConnectionProvider.headersList[index] );
                       },
                       itemCount: mailConnectionProvider.headersList.length,
                     )
