@@ -120,7 +120,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _emailAddress,
                           onFieldSubmitted: ( _ ) {
@@ -153,7 +153,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _emailPassword,
                           onSaved: ( value ) {
@@ -183,7 +183,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _senderName,
                           onSaved: ( value ) {
@@ -204,7 +204,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                         Text(
                           'Incoming Mail Settings',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color 
+                            color: Theme.of(context).textTheme.headline6.color 
                           ),
                         ),
 
@@ -221,7 +221,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _incomingMailsServer,
                           onSaved: ( value ) {
@@ -252,7 +252,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _incomingMailsPort,
                           onSaved: ( value ) {
@@ -273,7 +273,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                         Text(
                           'Outgoing Mail Settings',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color 
+                            color: Theme.of(context).textTheme.headline6.color 
                           ),
                         ),
 
@@ -290,7 +290,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _outgoingMailsServer,
                           onSaved: ( value ) {
@@ -321,7 +321,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _outgoingMailsPort,
                           onSaved: ( value ) {
@@ -346,7 +346,7 @@ class _AddExchangeAccountScreenState extends State<AddExchangeAccountScreen> {
                   child: Text(
                     'Add Account',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.title.color
+                      color: Theme.of(context).textTheme.headline6.color
                     ),
                   ),
                 ),

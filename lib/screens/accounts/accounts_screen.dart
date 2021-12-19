@@ -50,13 +50,13 @@ class AccountsScreen extends StatelessWidget {
                 title: Text(
                   'komnatadeveloper@gmail.com',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.title.color,
+                    color: Theme.of(context).textTheme.headline6.color,
                     fontSize: 18
                   ),
                 ),
                 trailing: Icon(
                   Icons.keyboard_arrow_right,
-                  color: Theme.of(context).textTheme.title.color,
+                  color: Theme.of(context).textTheme.headline6.color,
                 ),
                 onTap: () {
                   // Navigator.of(context).pushReplacementNamed(
@@ -71,13 +71,13 @@ class AccountsScreen extends StatelessWidget {
                 title: Text(
                   'komnatadeveloper@gmail.com',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.title.color,
+                    color: Theme.of(context).textTheme.headline6.color,
                     fontSize: 18
                   ),
                 ),
                 trailing: Icon(
                   Icons.keyboard_arrow_right,
-                  color: Theme.of(context).textTheme.title.color,
+                  color: Theme.of(context).textTheme.headline6.color,
                 ),
                 onTap: () {
                   // Navigator.of(context).pushReplacementNamed(
@@ -97,7 +97,7 @@ class AccountsScreen extends StatelessWidget {
                 child: Text(
                   'Add Account',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.title.color
+                    color: Theme.of(context).textTheme.headline6.color
                   ),
                 ),
               ),

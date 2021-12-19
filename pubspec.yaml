@@ -14,14 +14,14 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.10.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   
   intl: ^0.16.1
-  provider: ^3.0.0
+  provider: ^5.0.0
   http: ^0.12.0+4
   enough_mail: ^0.0.6  # ise yaramadi
 

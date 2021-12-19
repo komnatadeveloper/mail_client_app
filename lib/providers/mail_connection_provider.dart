@@ -480,7 +480,9 @@ class MailConnectionProvider with ChangeNotifier {
       }
 
     }
-    notifyListeners();
+    await Future.delayed(Duration(milliseconds: 1), () {
+      notifyListeners();
+    });
   }  // End of getAllHeaders
 
  

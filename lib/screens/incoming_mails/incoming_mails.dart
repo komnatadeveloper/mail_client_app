@@ -46,7 +46,7 @@ class IncomingMails  extends StatelessWidget {
                       child: Text(
                         'No Mails',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.title.color
+                          color: Theme.of(context).textTheme.headline6.color
                         ),
                       ),
                     )

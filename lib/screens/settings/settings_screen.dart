@@ -48,13 +48,13 @@ class SettingsScreen extends StatelessWidget {
                     title: Text(
                       'Accounts',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.title.color,
+                        color: Theme.of(context).textTheme.headline6.color,
                         fontSize: 18
                       ),
                     ),
                     trailing: Icon(
                       Icons.keyboard_arrow_right,
-                      color: Theme.of(context).textTheme.title.color,
+                      color: Theme.of(context).textTheme.headline6.color,
                     ),
                     onTap: () {
                       Navigator.of(context).pushReplacementNamed(

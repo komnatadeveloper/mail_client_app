@@ -87,7 +87,7 @@ class _VarMaterialAppState extends State<VarMaterialApp> {
           // primarySwatch: Colors.black.[400],
           textTheme: ThemeData.light().textTheme.copyWith(
 
-            title: TextStyle(
+            headline6: TextStyle(
               color: Colors.white
             ),
 
