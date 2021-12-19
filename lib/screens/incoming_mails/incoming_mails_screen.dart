@@ -41,7 +41,8 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
     // IncomingMailsScreen not Inited & Clients Provider ALREADY INITIALISED (not isInitialising)
     if( !_isInited 
       && !Provider.of<ClientsProvider>(context).isInitialising 
-      && !Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised  
+      && !Provider.of<MailConnectionProvider>(context)
+        .mailConnectionProviderStatus.isIncomingMailsScreenInitialised  
       ) {
       Provider.of<MailConnectionProvider>(context, listen: false).getAllHeaders()
         .then( (_) {
@@ -55,7 +56,8 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
     if( 
       !_isInited 
       && !Provider.of<ClientsProvider>(context).isInitialising 
-      && Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised 
+      && Provider.of<MailConnectionProvider>(context)
+        .mailConnectionProviderStatus.isIncomingMailsScreenInitialised 
      ) {
        Provider.of<MailConnectionProvider>(context,listen: false).checkandAddNewHeaders()
         .then( ( _ ) {

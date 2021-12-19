@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mail_client_app/models/mail_connection_provider_status.dart';
 import 'package:provider/provider.dart';
-
+// Providers
 import './providers/mail_connection_provider.dart';
 import './providers/clients_provider.dart';
-
-
+// Screens
 import './screens/incoming_mails/incoming_mails_screen.dart';
 import './screens/accounts/accounts_screen.dart';
 import './screens/settings/settings_screen.dart';
@@ -87,7 +86,7 @@ class _VarMaterialAppState extends State<VarMaterialApp> {
           // primarySwatch: Colors.black.[400],
           textTheme: ThemeData.light().textTheme.copyWith(
 
-            title: TextStyle(
+            headline6: TextStyle(
               color: Colors.white
             ),
 

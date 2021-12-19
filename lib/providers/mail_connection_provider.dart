@@ -242,66 +242,53 @@ class MailConnectionProvider with ChangeNotifier {
   
 
 
-  String handleFetchedComplexBase64 (String data) {      
-
-
+  String handleFetchedComplexBase64 (String data) { 
     if( data.toString().contains('?utf-8?B?')  || data.toString().contains('?UTF-8?B?') ) {
       var datatoHandle = data.toString();
-
       // Transform String
       var step1 = datatoHandle.replaceAll('=?utf-8?B?', 'STARTER');             
       var step2 = step1.replaceAll('=?UTF-8?B?', 'STARTER'); 
       var step3 = step2.replaceAll('==?=', 'ENDING'); 
-      var step4 = step3.replaceAll('?=', 'ENDING');            
-
+      var step4 = step3.replaceAll('?=', 'ENDING');  
       List<String> stringArray = [];
       int stringStartIndex;
       int stringEndIndex;
       String addString;
-
       // Creating Strings Array
       while( step4.contains('STARTER')  ) {
         stringStartIndex = step4.indexOf('STARTER');
         stringEndIndex = step4.indexOf('ENDING');
-
         addString = step4.substring( stringStartIndex+7, stringEndIndex );
         stringArray.add( addString );
         step4 = step4.substring(stringEndIndex + 6 );
       }
-
       // Add Elements in String Array to Single String
       String printableString ='';
       stringArray.forEach( (element) {        
         printableString = printableString + enoughMail.EncodingsHelper.decodeBase64(element, convert.utf8);
       } );  
       return printableString;
-
     } else if( data.toString().contains('=?UTF-8?Q?') || data.toString().contains('=?utf-8?Q?')  ) {      
-      var datatoHandle = data.toString();     
-
+      var datatoHandle = data.toString();  
       // Transform String
       var step1 = datatoHandle.replaceAll('?= =?utf-8?Q?', 'ENDINGSTARTER');
       step1 = step1.replaceAll('=?utf-8?Q?', 'STARTER');
       step1 =step1.replaceAll('?= =?UTF-8?Q?', 'ENDINGSTARTER');
       step1 = step1.replaceAll('=?UTF-8?Q?', 'STARTER');
       step1 = step1.replaceAll('==?=', 'ENDING'); 
-      step1 = step1.replaceAll('?=', 'ENDING');             
-
+      step1 = step1.replaceAll('?=', 'ENDING'); 
       List<String> stringArray = [];
       int stringStartIndex;
       int stringEndIndex;
       String addString;
-
       // Creating Strings Array
       while( step1.contains('STARTER')  ) {
         stringStartIndex = step1.indexOf('STARTER');
         stringEndIndex = step1.indexOf('ENDING');
-
         // If there is some "not encoded" text at the beginning
         if(stringStartIndex >= 0) {
           stringArray.add( step1.substring(0, stringStartIndex)  );
-        }        
-
+        }    
         addString = enoughMail.EncodingsHelper.decodeQuotedPrintable(
           step1.substring( stringStartIndex+7, stringEndIndex ),
           convert.utf8
@@ -309,19 +296,16 @@ class MailConnectionProvider with ChangeNotifier {
         stringArray.add( addString );
         step1 = step1.substring(stringEndIndex + 6 );
       }
-
       // If there is some "not encoded" text at the END
       if(step1.length > 0) {
         stringArray.add(step1);
       }
-
       // Add Elements in String Array to Single String
       String printableString ='';
       stringArray.forEach( (element) {        
         printableString = printableString + element;
       } );  
       return printableString;
-
     } else {      
       return data; // Return without any manipulation
     }
@@ -349,25 +333,22 @@ class MailConnectionProvider with ChangeNotifier {
     int firstIndex,
     int lastIndex
    ) async {
-
     List<EmailItemModel> fetchedEmailHeaderList =[];
-
     // var dates = await client.fetchMessages(1, 10, "BODY.PEEK[HEADER]");
     var rawResponse = await client.fetchMessages(
       firstIndex, 
       lastIndex, 
       // 1,31,
-      "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
+      // "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
       // "BODY.PEEK[HEADER]"
       // 'BODY.PEEK[HEADER.FIELDS (Received)]'
       // 'BODY.PEEK[HEADER.FIELDS (Message-ID)]'  // Message-ID BU SEKILDE
       // 'BODY.PEEK[HEADER.FIELDS (Message-ID Received)]'
-      // 'BODY[]'
+      'BODY[]'
       // '( BODY[] UID )'
       // 'BODY[TEXT]'
     );
     var mappedData = rawResponse.result;
-
     var currentIndex = firstIndex;
     mappedData.forEach( (mimeItem) {
       String contentType;
@@ -375,7 +356,6 @@ class MailConnectionProvider with ChangeNotifier {
       String subject;
       DateTime date;
       DateTime deliveryDate;
-
       mimeItem.headers.forEach( ( headersItem ) {
         switch ( headersItem.name ) {
           case  'Content-Type' : 
@@ -398,7 +378,6 @@ class MailConnectionProvider with ChangeNotifier {
             // print( 'INTERESTING HEADER: ' +headersItem.name + ':' + headersItem.value );
         }
       });      
-
       // Create Email Header From Sorted Headers
       var emailHeader = EmailHeader.withId(
         subject: handleFetchedComplexBase64(subject),
@@ -409,7 +388,6 @@ class MailConnectionProvider with ChangeNotifier {
         ),
         emailId: currentIndex
       );
-
       // Add Each Header To Our Temporary List
       fetchedEmailHeaderList.add( 
         EmailItemModel(
@@ -417,17 +395,18 @@ class MailConnectionProvider with ChangeNotifier {
         ) 
       );
       currentIndex++;
-
     }); // End of Iterating over each Mime
-
     return fetchedEmailHeaderList;    
   }  // End of fetchHeaderFields
 
 
 
   Future<void> getHeaders (
-     enoughMail.ImapClient client
+    //  enoughMail.ImapClient client
+     ClientItem clientItem
     ) async {    
+
+    var client = clientItem.imapClient;
 
     // List Mailboxes
     var listResponse;
@@ -447,13 +426,20 @@ class MailConnectionProvider with ChangeNotifier {
       // Mail Count
       final mailCount = listResponse.result[0].messagesExists;
       
-      final tempEmailsList = await fetchHeaderFields( 
+      var tempEmailsList = await fetchHeaderFields( 
         client, 
         1,  
         mailCount <= 50 ? mailCount : 50
-      );
+      );     
       // print('ThIS IS FETCHED HEADER FIELDS OF THIS CLIENT');
       // print(tempEmailsList);
+
+      // Add Client to each emailItem
+      for( int i = 0; i < tempEmailsList.length; i++ ) {
+        var tempEmailItem = tempEmailsList[i];
+        tempEmailItem.emailAccount = clientItem.emailAccount;
+        tempEmailsList[i] = tempEmailItem;
+      }
 
       emailList.addAll( tempEmailsList.reversed );
 
@@ -476,7 +462,9 @@ class MailConnectionProvider with ChangeNotifier {
       }
 
       for(  int i = 0; i < clientList.length; i++) {
-        await getHeaders( clientList[i].imapClient );
+        await getHeaders(
+          clientList[i]
+        );
       }
 
     }
@@ -535,6 +523,43 @@ class MailConnectionProvider with ChangeNotifier {
       print( accountToAdd );
     }    
   }   // End of addAccount
+
+
+  Future<void> fetchSingleMessage ({
+    int messageSequenceId,
+    EmailAccount emailAccount
+  }) async {
+    var relatedClient = clientList.firstWhere(
+      (element) => element.emailAccount.emailAddress == emailAccount.emailAddress
+    ).imapClient;
+    var rawResponse = await relatedClient.fetchMessages(
+      // lowerMessageSequenceId, upperMessageSequenceId, fetchContentDefinition
+      messageSequenceId, 
+      messageSequenceId, 
+      "BODY.PEEK[]"
+      // 'BODY'
+            // "BODY.PEEK[HEADER.FIELDS (Subject From Date Delivery-date Content-Type charset )]"
+      // "BODY.PEEK[HEADER]"
+      // 'BODY.PEEK[HEADER.FIELDS (Received)]'
+      // 'BODY.PEEK[HEADER.FIELDS (Message-ID)]'  // Message-ID BU SEKILDE
+      // 'BODY.PEEK[HEADER.FIELDS (Message-ID Received)]'
+      // 'BODY[]'
+      // 'ENVELOPE'
+      // 'RFC822.SIZE'
+      // 'ALL'
+      // '(ENVELOPE BODY[] FLAGS TEXT)'
+      // 'TEXT'
+      // 'envelope'
+      // 'BODY.PEEK[]'
+      // 'BODY'
+      // '( BODY[] UID )'
+      // 'BODY[TEXT]'
+      // 'BODY[TEXT]'
+      // 'BODYSTRUCTURE'
+    );
+    var mappedData = rawResponse.result;
+    print( 'fetchSingleMessage -> mappedData -> $mappedData'   );
+  }
 
 
   

@@ -1,62 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:jiffy/jiffy.dart' as jiffyPackage;
+import 'package:mail_client_app/providers/mail_connection_provider.dart';
+import 'package:provider/provider.dart';
+// helpers
+import '../../helpers/helpers.dart' as helpers;
 
 import '../../models/email_item_model.dart';
 
 class MailItem extends StatelessWidget {
 
-  final EmailHeader   incomingMailsListItem;
+  // final EmailHeader   incomingMailsListItem;
+  final EmailItemModel   incomingEmailItemModel;
 
-  MailItem( this.incomingMailsListItem );
+  MailItem( this.incomingEmailItemModel );
+  
 
 
-  String get formattedDateForPrintOut {   
-    // If Today
-    if( 
-      intl.DateFormat( 'yyyy/MM/dd' ).format( DateTime.now() )
-      == intl.DateFormat( 'yyyy/MM/dd' ).format( 
-          incomingMailsListItem.date
-        )   
-    ) {
-      return intl.DateFormat( 'HH:mm' ).format( incomingMailsListItem.date );
-    }
-    // If Yesterday
-    if( 
-      intl.DateFormat( 'yyyy/MM/dd' ).format(
-        DateTime.now().subtract(
-          Duration(days: 1)
-        ) 
-      )
-      == intl.DateFormat( 'yyyy/MM/dd' ).format( 
-        incomingMailsListItem.date
-      )   
-    ) {
-      return 'Yesterday';
-    }
-    // If Last 7 Days
-    if( DateTime.now().isAfter(
-      jiffyPackage.Jiffy(      
-      intl.DateFormat( 'dd, MMM yyyy' ).format(
-        DateTime.now()
-          .subtract(
-            Duration(days: 6)
-          )
-      ),
-      'dd, MMM yyyy'
-      ).dateTime
-    )) {
-      return intl.DateFormat( 'd, MMM' ).format( 
-        incomingMailsListItem.date
-      );  
-    }
-    // If Older
-    return intl.DateFormat('yyyy/MM/dd').format( incomingMailsListItem.date );
-  } // End of formattedDateForPrintOut
+  
 
 
   @override
   Widget build(BuildContext context) {
+    var header = incomingEmailItemModel.header;
+   
 
 
     return  Container(
@@ -75,9 +42,18 @@ class MailItem extends StatelessWidget {
 
       child: GestureDetector(
         onTap: () {
-          print('Date: ${incomingMailsListItem.date}');
-          print('Date: ${incomingMailsListItem.subject}');
-          print('Date: ${incomingMailsListItem.emailId}');
+          print('Screens -> Incoming Mails -> Mail Item -> onTap -> ');
+          print('Date: ${header.date}');
+          print('Subject: ${header.subject}');
+          print('emailId: ${header.emailId}');
+          print('emailAccount.emailAddress: ${incomingEmailItemModel.emailAccount.emailAddress}');
+
+          Provider.of<MailConnectionProvider>(context).fetchSingleMessage(
+            messageSequenceId: incomingEmailItemModel.header.emailId,
+            emailAccount: incomingEmailItemModel.emailAccount
+            
+
+          );
         },
         child: Column(
           children: <Widget>[
@@ -91,11 +67,11 @@ class MailItem extends StatelessWidget {
               ),
               height: 20,
               child: Text( 
-                incomingMailsListItem.from ,
+                header.from ,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.title.color
+                  color: Theme.of(context).textTheme.headline6.color
                 ),
               ),
             ),
@@ -108,11 +84,11 @@ class MailItem extends StatelessWidget {
                 left: 5
               ),
               child: Text( 
-                incomingMailsListItem.subject,
+                header.subject,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold ,
-                  color: Theme.of(context).textTheme.title.color
+                  color: Theme.of(context).textTheme.headline6.color
                 ),
               )
             ),
@@ -139,7 +115,7 @@ class MailItem extends StatelessWidget {
                       overflow: TextOverflow.clip,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context).textTheme.title.color,
+                        color: Theme.of(context).textTheme.headline6.color,
                         fontWeight: FontWeight.w300
                       ),
                     )
@@ -147,10 +123,12 @@ class MailItem extends StatelessWidget {
 
                   Text( 
                     // '  ${DateFormat('yyyy/MM/dd').format(incomingMailsListItem.date)}' ,
-                    formattedDateForPrintOut,
+                    helpers.formattedDateForPrintOut(
+                      header.date
+                    ),
                     style: TextStyle(
                       fontSize: 12,
-                      color: Theme.of(context).textTheme.title.color,
+                      color: Theme.of(context).textTheme.headline6.color,
                       fontWeight: FontWeight.w300
                     ),
                   ),

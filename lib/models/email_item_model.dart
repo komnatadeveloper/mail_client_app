@@ -1,4 +1,4 @@
-
+import './email_account.dart';
 
 
 class  EmailHeader {
@@ -7,6 +7,7 @@ class  EmailHeader {
   DateTime date; 
   List<String> recipients;  // list of people, when sending email
   int emailId;
+  EmailAccount emailAccount;
 
   EmailHeader( {
     this.from,
@@ -34,6 +35,7 @@ class  EmailHeader {
 
 class EmailItemModel {
   EmailHeader header;
+  EmailAccount emailAccount;
 
   // When Sending
   String text;

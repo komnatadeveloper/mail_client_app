@@ -20,7 +20,7 @@ class IncomingAccountItem extends StatelessWidget {
           Text(
             email,
             style: TextStyle(
-              color: Theme.of(context).textTheme.title.color
+              color: Theme.of(context).textTheme.headline6.color
             ),
           ),
           Chip(
@@ -32,7 +32,7 @@ class IncomingAccountItem extends StatelessWidget {
               unreadCount,
               style: TextStyle(
                 fontSize: 10,
-                color: Theme.of(context).textTheme.title.color
+                color: Theme.of(context).textTheme.headline6.color
               ),
             ),
             labelPadding: EdgeInsets.symmetric(

@@ -67,7 +67,7 @@ class _NewEmailFormState extends State<NewEmailForm> {
                 IconButton(
                   icon: Icon(
                     Icons.close,
-                    color: Theme.of(context).textTheme.title.color,
+                    color: Theme.of(context).textTheme.headline6.color,
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -76,13 +76,13 @@ class _NewEmailFormState extends State<NewEmailForm> {
                 Text(
                   senderAccount.emailAccount.emailAddress,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.title.color
+                    color: Theme.of(context).textTheme.headline6.color
                   ),                             
                 ),
                 IconButton(
                   icon: Icon(
                     Icons.send,
-                    color: Theme.of(context).textTheme.title.color,
+                    color: Theme.of(context).textTheme.headline6.color,
                   ),
                   onPressed: () async {  
 
@@ -122,7 +122,7 @@ class _NewEmailFormState extends State<NewEmailForm> {
                                 maxLines: null,
                                 keyboardType: TextInputType.multiline,
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.title.color
+                                  color: Theme.of(context).textTheme.headline6.color
                                 ),
                                 focusNode: _toFocusNode,
                                 onSaved: ( value ) {
@@ -167,7 +167,7 @@ class _NewEmailFormState extends State<NewEmailForm> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _subjectFocusNode,
                           onFieldSubmitted: ( _ ) {
@@ -200,7 +200,7 @@ class _NewEmailFormState extends State<NewEmailForm> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.title.color
+                            color: Theme.of(context).textTheme.headline6.color
                           ),
                           focusNode: _contentFocusNode,
                           onSaved: ( value ) {

@@ -46,13 +46,16 @@ class IncomingMails  extends StatelessWidget {
                       child: Text(
                         'No Mails',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.title.color
+                          color: Theme.of(context).textTheme.headline6.color
                         ),
                       ),
                     )
                     : ListView.builder(
                       itemBuilder: ( ctx, index ) {
-                        return MailItem( mailConnectionProvider.headersList[index] );
+                        return MailItem( 
+                          // mailConnectionProvider.headersList[index] 
+                          mailConnectionProvider.emailList[index]
+                        );
                       },
                       itemCount: mailConnectionProvider.headersList.length,
                     )
