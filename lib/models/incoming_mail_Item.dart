@@ -7,9 +7,9 @@ class IncomingMailItem {
   final DateTime date;
 
   IncomingMailItem ( {
-    @required this.senderName,
-    @required this.emailTitle,
-    @required this.emailBody,
-    @required this.date
+    required this.senderName,
+    required this.emailTitle,
+    required this.emailBody,
+    required this.date
   } );
 }

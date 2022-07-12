@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:jiffy/jiffy.dart' as jiffyPackage;
+import 'package:provider/provider.dart';
 
+
+// Providers
+import '../../providers/mail_connection_provider.dart';
+
+// Models
 import '../../models/email_item_model.dart';
 
 class MailItem extends StatelessWidget {
 
-  final EmailHeader   incomingMailsListItem;
+  // final EmailHeader   incomingMailsListItem;
+  // final EmailHeader   incomingMailEmailItem.header;
+  final EmailItemModel incomingMailEmailItem;
 
-  MailItem( this.incomingMailsListItem );
+  MailItem( this.incomingMailEmailItem );
 
 
   String get formattedDateForPrintOut {   
@@ -16,10 +24,10 @@ class MailItem extends StatelessWidget {
     if( 
       intl.DateFormat( 'yyyy/MM/dd' ).format( DateTime.now() )
       == intl.DateFormat( 'yyyy/MM/dd' ).format( 
-          incomingMailsListItem.date
+          incomingMailEmailItem.header.date!
         )   
     ) {
-      return intl.DateFormat( 'HH:mm' ).format( incomingMailsListItem.date );
+      return intl.DateFormat( 'HH:mm' ).format( incomingMailEmailItem.header.date! );
     }
     // If Yesterday
     if( 
@@ -29,7 +37,7 @@ class MailItem extends StatelessWidget {
         ) 
       )
       == intl.DateFormat( 'yyyy/MM/dd' ).format( 
-        incomingMailsListItem.date
+        incomingMailEmailItem.header.date!
       )   
     ) {
       return 'Yesterday';
@@ -47,16 +55,21 @@ class MailItem extends StatelessWidget {
       ).dateTime
     )) {
       return intl.DateFormat( 'd, MMM' ).format( 
-        incomingMailsListItem.date
+        incomingMailEmailItem.header.date!
       );  
     }
     // If Older
-    return intl.DateFormat('yyyy/MM/dd').format( incomingMailsListItem.date );
+    return intl.DateFormat('yyyy/MM/dd').format( incomingMailEmailItem.header.date! );
   } // End of formattedDateForPrintOut
 
 
   @override
   Widget build(BuildContext context) {
+
+    var hasAttachments =  incomingMailEmailItem.hasAttachments == true;
+    if ( hasAttachments) {
+      print(hasAttachments);
+    }
 
 
     return  Container(
@@ -75,9 +88,17 @@ class MailItem extends StatelessWidget {
 
       child: GestureDetector(
         onTap: () {
-          print('Date: ${incomingMailsListItem.date}');
-          print('Date: ${incomingMailsListItem.subject}');
-          print('Date: ${incomingMailsListItem.emailId}');
+          print('Date: ${incomingMailEmailItem.header.date}');
+          print('Date: ${incomingMailEmailItem.header.subject}');
+          print('Date: ${incomingMailEmailItem.header.emailId}');
+          // Provider.of<MailConnectionProvider>(context, listen: false).fetchMessageItemBody(
+          //   incomingEmailHeader: incomingMailEmailItem.header,
+          //   context: context,
+          // );
+          Provider.of<MailConnectionProvider>(context, listen: false).seeMessageItemOnWebviewScreen(
+            incomingEmailHeader: incomingMailEmailItem.header,
+            context: context,
+          );
         },
         child: Column(
           children: <Widget>[
@@ -91,11 +112,11 @@ class MailItem extends StatelessWidget {
               ),
               height: 20,
               child: Text( 
-                incomingMailsListItem.from ,
+                incomingMailEmailItem.header.from ,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.headline6.color
+                  color: Theme.of(context).textTheme.headline6?.color,
                 ),
               ),
             ),
@@ -103,17 +124,31 @@ class MailItem extends StatelessWidget {
 
             // Email Title
             Container(
-              alignment: Alignment(-1.0, -1.0),
+              // alignment: Alignment(-1.0, -1.0),
               margin: EdgeInsets.only(
                 left: 5
               ),
-              child: Text( 
-                incomingMailsListItem.subject,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold ,
-                  color: Theme.of(context).textTheme.headline6.color
-                ),
+              width: double.infinity,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text( 
+                      incomingMailEmailItem.header.subject,
+                      style: TextStyle(
+                        fontSize: 14,
+                        // fontWeight: FontWeight.bold ,
+                        color: Theme.of(context).textTheme.headline6?.color,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
+                    ),
+                  ),
+                  if ( hasAttachments )   Icon(
+                    Icons.attach_file, 
+                    color: Theme.of(context).textTheme.headline6?.color,
+                    size: 16,
+                  ),
+                ],
               )
             ),
 
@@ -133,24 +168,26 @@ class MailItem extends StatelessWidget {
                   Expanded(
                     child:                           
                     Text( 
-                      // incomingMailsListItem.emailBody,
-                      'This is Temporarily not OK',
+                      // incomingMailEmailItem.header.emailBody,
+                      // 'This is Temporarily not OK',
+                      incomingMailEmailItem.text ?? '-',
+                      
 
                       overflow: TextOverflow.clip,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context).textTheme.headline6.color,
+                        color: Theme.of(context).textTheme.headline6?.color,
                         fontWeight: FontWeight.w300
                       ),
                     )
                   ),
 
                   Text( 
-                    // '  ${DateFormat('yyyy/MM/dd').format(incomingMailsListItem.date)}' ,
+                    // '  ${DateFormat('yyyy/MM/dd').format(incomingMailEmailItem.header.date)}' ,
                     formattedDateForPrintOut,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Theme.of(context).textTheme.headline6.color,
+                      color: Theme.of(context).textTheme.headline6?.color,
                       fontWeight: FontWeight.w300
                     ),
                   ),

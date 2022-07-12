@@ -5,14 +5,14 @@ import './email_account.dart';
 
 class ClientItem {
 
-  enoughMail.ImapClient imapClient;
+  enoughMail.ImapClient? imapClient;
 
 
   EmailAccount emailAccount;
 
   ClientItem({
-    this.imapClient,
-    this.emailAccount
+    required this.imapClient,
+    required this.emailAccount
   });
 
 }

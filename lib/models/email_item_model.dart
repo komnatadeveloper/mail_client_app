@@ -4,28 +4,32 @@
 class  EmailHeader {
   String from;
   String subject;
-  DateTime date; 
-  List<String> recipients;  // list of people, when sending email
-  int emailId;
+  DateTime? date; 
+  List<String>? recipients;  // list of people, when sending email
+  int? emailId;
+  String? messageId;
+  String? clientEmail;
 
   EmailHeader( {
-    this.from,
-    this.subject,
+    required this.from,
+    required this.subject,
     this.date
   });
 
   EmailHeader.withId( {
-    this.from,
-    this.subject,
+    required this.from,
+    required this.subject,
     this.date,
-    this.emailId
+    required this.emailId,
+    this.messageId,
+    this.clientEmail,
   });
 
 
   EmailHeader.whenSendingEmail( {
-    this.from,
-    this.subject,
-    this.recipients
+    required this.from,
+    required this.subject,
+    required this.recipients
   });
 
 }
@@ -36,17 +40,37 @@ class EmailItemModel {
   EmailHeader header;
 
   // When Sending
-  String text;
+  String? text;
+
+  String? emailHtml;
+
+  String? mediaType;
+
+  bool? hasAttachments;
 
 
   EmailItemModel( {
-    this.header
+    required this.header,
+    this.text,
+    this.emailHtml,
+    this.mediaType,
+    this.hasAttachments,
   });
 
   EmailItemModel.whenSendingEmail( {
-    this.header,
-    this.text
+    required this.header,
+    required this.text
   });
+
+
+
+  EmailItemModel.fetchedBody({    
+    required this.header,
+    required this.text,
+    this.emailHtml,
+  });
+
+
 
 
 }

@@ -2,7 +2,7 @@
 
 class EmailAccount {
 
-  String senderName;  // Your prefered name
+  String? senderName;  // Your prefered name
   String emailAddress;
   String emailPassword;
   String incomingMailsServer;
@@ -10,7 +10,7 @@ class EmailAccount {
   String outgoingMailsServer;
   String outgoingMailsPort;
 
-  DateTime lastConnectionTime;
+  DateTime? lastConnectionTime;
 
 
 
@@ -21,12 +21,12 @@ class EmailAccount {
 
   EmailAccount( {
     this.senderName,
-    this.emailAddress,
-    this.emailPassword,
-    this.incomingMailsServer,
-    this.incomingMailsPort,
-    this.outgoingMailsServer,
-    this.outgoingMailsPort,
+    required this.emailAddress,
+    required this.emailPassword,
+    required this.incomingMailsServer,
+    required this.incomingMailsPort,
+    required this.outgoingMailsServer,
+    required this.outgoingMailsPort,
   });
 
 

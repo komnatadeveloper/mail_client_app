@@ -35,7 +35,7 @@ class _NewEmailFormState extends State<NewEmailForm> {
     // if( !isValid ) {
     //   return;
     // }
-    _formSendEmailobalKey.currentState.save(); 
+    _formSendEmailobalKey.currentState?.save(); 
     Provider.of<MailConnectionProvider>(context).sendMail( _editedEnvelope );
   }  // end of _saveForm
 
@@ -67,7 +67,7 @@ class _NewEmailFormState extends State<NewEmailForm> {
                 IconButton(
                   icon: Icon(
                     Icons.close,
-                    color: Theme.of(context).textTheme.headline6.color,
+                    color: Theme.of(context).textTheme.headline6?.color,
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -76,13 +76,13 @@ class _NewEmailFormState extends State<NewEmailForm> {
                 Text(
                   senderAccount.emailAccount.emailAddress,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.headline6.color
+                    color: Theme.of(context).textTheme.headline6?.color
                   ),                             
                 ),
                 IconButton(
                   icon: Icon(
                     Icons.send,
-                    color: Theme.of(context).textTheme.headline6.color,
+                    color: Theme.of(context).textTheme.headline6?.color,
                   ),
                   onPressed: () async {  
 
@@ -122,26 +122,36 @@ class _NewEmailFormState extends State<NewEmailForm> {
                                 maxLines: null,
                                 keyboardType: TextInputType.multiline,
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.headline6.color
+                                  color: Theme.of(context).textTheme.headline6?.color
                                 ),
                                 focusNode: _toFocusNode,
                                 onSaved: ( value ) {
-                                  _editedEnvelope = EmailItemModel.whenSendingEmail(
-                                    header: EmailHeader.whenSendingEmail(
-                                      from: _editedEnvelope.header.from,
-                                      recipients: [ value ],
-                                      subject: _editedEnvelope.header.subject
-                                    ),
-                                    text: _editedEnvelope.text
-                                  );
+                                  if ( value != null ) {
+                                    _editedEnvelope = EmailItemModel.whenSendingEmail(
+                                      header: EmailHeader.whenSendingEmail(
+                                        from: _editedEnvelope.header.from,
+                                        recipients: [ value ],
+                                        subject: _editedEnvelope.header.subject
+                                      ),
+                                      text: _editedEnvelope.text
+                                    );
+                                  }
                                 },
 
                               ),
                             ),
-                            OutlineButton(
-                              borderSide: BorderSide(
-                                color: Colors.blue
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                shape:  RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: Colors.blue
+                                  ),
+                                  borderRadius: BorderRadius.circular(6),
+                                )
                               ),
+                                // borderSide: BorderSide(
+                                //   color: Colors.blue
+                                // ),
                               child: Text(
                                 'Cc: Bcc',
                                 style: TextStyle(
@@ -167,21 +177,23 @@ class _NewEmailFormState extends State<NewEmailForm> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.headline6.color
+                            color: Theme.of(context).textTheme.headline6?.color
                           ),
                           focusNode: _subjectFocusNode,
                           onFieldSubmitted: ( _ ) {
                             FocusScope.of(context).requestFocus( _contentFocusNode );
                           },
                           onSaved: ( value ) {
-                            _editedEnvelope = EmailItemModel.whenSendingEmail(
-                              header: EmailHeader.whenSendingEmail(
-                                from: _editedEnvelope.header.from,
-                                recipients: _editedEnvelope.header.recipients,
-                                subject: value
-                              ),
-                              text: _editedEnvelope.text
-                            );
+                             if ( value != null ) {
+                              _editedEnvelope = EmailItemModel.whenSendingEmail(
+                                header: EmailHeader.whenSendingEmail(
+                                  from: _editedEnvelope.header.from,
+                                  recipients: _editedEnvelope.header.recipients,
+                                  subject: value
+                                ),
+                                text: _editedEnvelope.text
+                              );
+                             }
                           },
 
                         ),
@@ -200,7 +212,7 @@ class _NewEmailFormState extends State<NewEmailForm> {
                             
                           ),
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.headline6.color
+                            color: Theme.of(context).textTheme.headline6?.color
                           ),
                           focusNode: _contentFocusNode,
                           onSaved: ( value ) {

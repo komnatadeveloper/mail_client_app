@@ -39,21 +39,21 @@ class AppDrawer extends StatelessWidget {
                     title: Text(
                       'Incoming',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color,
+                        color: Theme.of(context).textTheme.headline6?.color,
                         fontSize: 18
                       ),
                     ),
                     subtitle: Text(
                       'All Accounts',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color,
+                        color: Theme.of(context).textTheme.headline6?.color,
                         fontWeight: FontWeight.w200,
                         fontSize: 12
                       ),
                     ),
                     trailing: IconButton(
                       icon: Icon(Icons.keyboard_arrow_up),
-                      color: Theme.of(context).textTheme.headline6.color,
+                      color: Theme.of(context).textTheme.headline6?.color,
                       onPressed: ( ) {
                         print( 'AppDrawer Incoming Icon Button');
                       },
@@ -109,7 +109,7 @@ class AppDrawer extends StatelessWidget {
                     title: Text(
                       'Viewed',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color,
+                        color: Theme.of(context).textTheme.headline6?.color,
                         fontSize: 18
                       ),
                     ),                
@@ -130,13 +130,13 @@ class AppDrawer extends StatelessWidget {
                     title: Text(
                       'Sent',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color,
+                        color: Theme.of(context).textTheme.headline6?.color,
                         fontSize: 18
                       ),
                     ),
                     trailing: IconButton(
                       icon: Icon(Icons.keyboard_arrow_up),
-                      color: Theme.of(context).textTheme.headline6.color,
+                      color: Theme.of(context).textTheme.headline6?.color,
                       onPressed: ( ) {
                         print( 'AppDrawer Incoming Icon Button');
                       },
@@ -158,13 +158,13 @@ class AppDrawer extends StatelessWidget {
                     title: Text(
                       'Archieve',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color,
+                        color: Theme.of(context).textTheme.headline6?.color,
                         fontSize: 18
                       ),
                     ),
                     trailing: IconButton(
                       icon: Icon(Icons.keyboard_arrow_up),
-                      color: Theme.of(context).textTheme.headline6.color,
+                      color: Theme.of(context).textTheme.headline6?.color,
                       onPressed: ( ) {
                         print( 'AppDrawer Incoming Icon Button');
                       },
@@ -186,13 +186,13 @@ class AppDrawer extends StatelessWidget {
                     title: Text(
                       'Trash',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color,
+                        color: Theme.of(context).textTheme.headline6?.color,
                         fontSize: 18
                       ),
                     ),
                     trailing: IconButton(
                       icon: Icon(Icons.keyboard_arrow_up),
-                      color: Theme.of(context).textTheme.headline6.color,
+                      color: Theme.of(context).textTheme.headline6?.color,
                       onPressed: ( ) {
                         print( 'AppDrawer Incoming Icon Button');
                       },
@@ -214,7 +214,7 @@ class AppDrawer extends StatelessWidget {
                     title: Text(
                       'Settings',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color,
+                        color: Theme.of(context).textTheme.headline6?.color,
                         fontSize: 18
                       ),
                     ),

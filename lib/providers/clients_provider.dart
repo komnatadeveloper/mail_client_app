@@ -16,9 +16,9 @@ class ClientsProvider with ChangeNotifier {
   List<EmailAccount> _emailAccountList = [];
   List<ClientItem> _clientList = [];
   var _isImapClientLogin = false;
-  int _accountCount;
-  String _preferredMail;
-  String _preferredView;
+  int? _accountCount;
+  String? _preferredMail;
+  String? _preferredView;
   bool _isLoadingIncoming = false;
 
   bool get isInitialising {
@@ -35,13 +35,13 @@ class ClientsProvider with ChangeNotifier {
     return _isImapClientLogin;
   }
   int get accountCount {
-    return _accountCount;
+    return _accountCount  ?? 0;
   }
   String get preferredMail {
-    return _preferredMail;
+    return _preferredMail ?? 'inbox';
   }
   String get preferredView {
-    return _preferredView;
+    return _preferredView ?? 'all';
   }
 
   
@@ -96,8 +96,8 @@ class ClientsProvider with ChangeNotifier {
 
     } else {  // NOT FIRST USE OF APP 
       final extractedUserData = convert.json.decode(
-        prefs.getString('komnataMailClient')
-      ) as Map<String, Object>;
+        prefs.getString('komnataMailClient')!
+      ) as Map<String, dynamic>;
 
       // await prefs.remove('komnataMailClient');
       // return;
@@ -106,13 +106,9 @@ class ClientsProvider with ChangeNotifier {
       // print('getInitDataFromDb ${tempAccountList.length} Accounts Exists');
 
       _accountCount = tempAccountList.length;
-      if( _accountCount > 0 ) {
+      if( accountCount > 0 ) {
         tempAccountList.forEach( (accountItem) {
 
-          var clientItem = new  ClientItem(
-            emailAccount: null,
-            imapClient: null
-          );
           var newAccount = EmailAccount(
               senderName: accountItem['senderName'],
               emailAddress: accountItem['email'],
@@ -122,6 +118,11 @@ class ClientsProvider with ChangeNotifier {
               outgoingMailsServer: accountItem['outgoingServer'],
               outgoingMailsPort: accountItem['outgoingPort'],
           );
+          var clientItem = new  ClientItem(
+            emailAccount: newAccount,
+            imapClient: null
+          );
+          
           clientItem.emailAccount = newAccount;      
           _clientList.add( clientItem );
         });
@@ -154,7 +155,10 @@ class ClientsProvider with ChangeNotifier {
           account.emailPassword
         );
 
-        if (  !loginResponse.isOkStatus ) {
+        if (  
+          // !loginResponse.isOkStatus 
+          !client.isLoggedIn
+        ) {
           print('Auth Error of ${account.emailAddress}');
         } else {
 

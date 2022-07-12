@@ -35,9 +35,9 @@ class MyApp extends StatelessWidget {
             reconnectAccounts: null  
           ),
           update: ( _, clientsProvider, previosMailConnectionProvider ) => MailConnectionProvider(
-            mailConnectionProviderStatus: previosMailConnectionProvider.mailConnectionProviderStatus,
+            mailConnectionProviderStatus: previosMailConnectionProvider?.mailConnectionProviderStatus,
             clientList: clientsProvider.clientList,
-            emailList: previosMailConnectionProvider.emailList,
+            emailList: previosMailConnectionProvider!.emailList  ,
             reconnectAccounts: clientsProvider.connectAndAddAllAccounts1
           )
 

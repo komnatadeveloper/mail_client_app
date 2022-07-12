@@ -39,9 +39,10 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
   void didChangeDependencies() {
     
     // IncomingMailsScreen not Inited & Clients Provider ALREADY INITIALISED (not isInitialising)
-    if( !_isInited 
+    if( 
+      !_isInited 
       && !Provider.of<ClientsProvider>(context).isInitialising 
-      && !Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised  
+      && Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus?.isIncomingMailsScreenInitialised  == false
       ) {
       Provider.of<MailConnectionProvider>(context, listen: false).getAllHeaders()
         .then( (_) {
@@ -55,7 +56,7 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
     if( 
       !_isInited 
       && !Provider.of<ClientsProvider>(context).isInitialising 
-      && Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised 
+      && Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus?.isIncomingMailsScreenInitialised == true
      ) {
        Provider.of<MailConnectionProvider>(context,listen: false).checkandAddNewHeaders()
         .then( ( _ ) {
@@ -104,7 +105,11 @@ class _IncomingMailsScreenState extends State<IncomingMailsScreen> {
           children: <Widget>[
             ( 
               !_isInited 
-              && !Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised 
+              // && !Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus.isIncomingMailsScreenInitialised 
+              && (
+                Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus == null 
+                || Provider.of<MailConnectionProvider>(context).mailConnectionProviderStatus?.isIncomingMailsScreenInitialised == false
+              )
             )
               ? Expanded(
                 child: Center(
